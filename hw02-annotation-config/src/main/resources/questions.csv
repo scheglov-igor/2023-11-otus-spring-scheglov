@@ -1,0 +1,4 @@
+# Добавить сюда своих вопросов. Эту строку надо пропустить при настройке CsvToBean (withSkipLines)
+Where does Santa Claus live?;The North Pole%true|Iceland%false|The South Pole%false|Australia%false
+Which of the following meats is traditionally carved at Christmas?;Beef%false|Turkey%true|Chicken%false|Lamb%false
+What baked Christmas treat is usually made in the shape of a person?;Cookie%false|Gingerbread man%true|Christmas Cake%false|Christmas Pudding%false
