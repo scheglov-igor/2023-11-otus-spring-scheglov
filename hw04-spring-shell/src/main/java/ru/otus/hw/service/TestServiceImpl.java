@@ -39,8 +39,8 @@ public class TestServiceImpl implements TestService {
             ioService.printFormattedLine("%d. %s", i, question.answers().get(i - 1).text());
         }
 
-        int answerNumber = ioService.readIntForRangeWithPrompt(1, question.answers().size(),
-                "enter answer 1-" + question.answers().size(), "can't read answer");
+        int answerNumber = ioService.readIntForRangeWithPromptLocalized(1, question.answers().size(),
+                "enterAnswer", "cantReadAnswer");
 
         if (question.answers().get(answerNumber - 1).isCorrect()) {
             isAnswerValid = true;
