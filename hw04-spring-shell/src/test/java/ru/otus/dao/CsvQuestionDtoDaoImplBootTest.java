@@ -1,9 +1,9 @@
 package ru.otus.dao;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.hw.dao.CsvQuestionDtoDao;
 import ru.otus.hw.dao.CsvQuestionDtoDaoImpl;
 import ru.otus.hw.dao.ResourcesReader;
@@ -20,11 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-public class CsvQuestionDtoDaoImplTest {
+@SpringBootTest(classes = CsvQuestionDtoDaoImpl.class)
+public class CsvQuestionDtoDaoImplBootTest {
 
-    @Mock
-    ResourcesReader resourcesReader;
+    @MockBean
+    private ResourcesReader resourcesReader;
+
+    @Autowired
+    CsvQuestionDtoDao csvQuestionDtoDao;
 
     @Test
     void testGetQuestionDtoList() throws IOException {
@@ -34,6 +37,7 @@ public class CsvQuestionDtoDaoImplTest {
         answerList.add(new Answer("TrueAnswer", true));
         answerList.add(new Answer("FalseAnswer1", false));
         answerList.add(new Answer("FalseAnswer2", false));
+
         var questionDto = new QuestionDto();
         questionDto.setText("MyQuestion");
         questionDto.setAnswers(answerList);
@@ -43,10 +47,6 @@ public class CsvQuestionDtoDaoImplTest {
         String csvAsString = "# row to skip\nMyQuestion;TrueAnswer%true|FalseAnswer1%false|FalseAnswer2%false";
         given(resourcesReader.getResourceFileAsReader()).willReturn(new StringReader(csvAsString));
 
-
-        CsvQuestionDtoDao csvQuestionDtoDao = new CsvQuestionDtoDaoImpl(resourcesReader);
-
-
         assertEquals(expectedQuestionDtoList, csvQuestionDtoDao.getQuestionDtoList());
 
     }
@@ -54,7 +54,7 @@ public class CsvQuestionDtoDaoImplTest {
     @Test
     void exceptionTesting() throws IOException {
         given(resourcesReader.getResourceFileAsReader()).willThrow(new IOException());
-        CsvQuestionDtoDao csvQuestionDtoDao = new CsvQuestionDtoDaoImpl(resourcesReader);
         assertThrows(QuestionReadException.class, csvQuestionDtoDao::getQuestionDtoList);
     }
+
 }

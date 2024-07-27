@@ -1,9 +1,9 @@
 package ru.otus.dao;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.ResourcesReader;
 import ru.otus.hw.dao.ResourcesReaderImpl;
@@ -15,11 +15,14 @@ import java.io.Reader;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-public class ResourcesReaderImplTest {
+@SpringBootTest(classes = ResourcesReaderImpl.class)
+public class ResourcesReaderImplBootTest {
 
-    @Mock
+    @MockBean
     private TestFileNameProvider fileNameProvider;
+
+    @Autowired
+    ResourcesReader resourcesReader;
 
     @Test
     void testGetResourceFileAsReader() throws IOException {
@@ -27,8 +30,6 @@ public class ResourcesReaderImplTest {
         String csvAsString = "# row to skipMyQuestion;TrueAnswer%true|FalseAnswer1%false|FalseAnswer2%false";
 
         given(fileNameProvider.getTestFileName()).willReturn("testCsvFile.csv");
-
-        ResourcesReader resourcesReader = new ResourcesReaderImpl(fileNameProvider);
 
         Reader reader = resourcesReader.getResourceFileAsReader();
 
@@ -40,6 +41,9 @@ public class ResourcesReaderImplTest {
             }
         }
 
-        assertEquals(csvAsString, content);
+       assertEquals(csvAsString, content);
+
     }
+
+
 }
