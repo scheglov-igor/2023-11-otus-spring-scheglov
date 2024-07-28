@@ -2,19 +2,17 @@ package ru.otus.hw.controller;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.shell.Availability;
-
 import org.springframework.shell.standard.AbstractShellComponent;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import ru.otus.hw.config.LocaleConfig;
-import ru.otus.hw.domain.Student;
 import ru.otus.hw.security.LoginContext;
 import ru.otus.hw.service.LocalizedMessagesService;
-import ru.otus.hw.service.ResultService;
 import ru.otus.hw.service.StudentService;
-import ru.otus.hw.service.TestService;
+import ru.otus.hw.service.TestRunnerService;
+
 
 import java.util.Locale;
 
@@ -27,20 +25,17 @@ public class ShellController extends AbstractShellComponent {
 
     private final StudentService studentService;
 
-    private final TestService testService;
-
-    private final ResultService resultService;
-
     private final LoginContext loginContext;
 
+    private final TestRunnerService testRunnerService;
+
     public ShellController(LocaleConfig localeConfig,
-                           @Qualifier("localizedMessagesServiceImpl") LocalizedMessagesService localizedMessagesService,
-                           StudentService studentService, TestService testService, ResultService resultService, LoginContext loginContext) {
+                       @Qualifier("localizedMessagesServiceImpl") LocalizedMessagesService localizedMessagesService,
+                       TestRunnerService testRunnerService, StudentService studentService, LoginContext loginContext) {
         this.localeConfig = localeConfig;
         this.localizedMessagesService = localizedMessagesService;
+        this.testRunnerService = testRunnerService;
         this.studentService = studentService;
-        this.testService = testService;
-        this.resultService = resultService;
         this.loginContext = loginContext;
     }
 
@@ -66,15 +61,15 @@ public class ShellController extends AbstractShellComponent {
     @ShellMethod(value = "Start testing", key = {"t", "test", "start"})
     @ShellMethodAvailability(value = "isTestingAvailable")
     public String test () {
-        var testResult = testService.executeTestFor(loginContext.getCurrentStudent());
-        resultService.showResult(testResult);
+        var testResult = testRunnerService.executeTestFor(loginContext.getCurrentStudent());
+        testRunnerService.showResult(testResult);
         return localizedMessagesService.getMessage("testFinished");
     }
 
     private Availability isTestingAvailable() {
         return loginContext.isUserLoggedIn() ?
-                Availability.unavailable(localizedMessagesService.getMessage("youShouldLogin")) :
-                Availability.available();
+                Availability.available() :
+                Availability.unavailable(localizedMessagesService.getMessage("youShouldLogin"));
     }
 
 }

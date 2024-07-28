@@ -27,7 +27,6 @@ public final class CsvQuestionDaoIntegrationTest {
     @Mock
     ResourcesReader resourcesReader;
 
-    @InjectMocks
     private QuestionDao csvQuestionDao;
 
     @BeforeEach

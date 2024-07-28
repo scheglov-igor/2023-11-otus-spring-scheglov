@@ -17,6 +17,7 @@ import java.util.List;
 public class CsvQuestionDao implements QuestionDao {
 
     private final QuestionDtoMapper questionDtoMapper;
+
     private final ResourcesReader resourcesReader;
 
     @Override
@@ -42,8 +43,7 @@ public class CsvQuestionDao implements QuestionDao {
     // и сделать публичным?
 
     private List<QuestionDto> findAllDto() {
-        try {
-            Reader csvReader = resourcesReader.getResourceFileAsReader();
+        try (Reader csvReader = resourcesReader.getResourceFileAsReader()) {
 
             List<QuestionDto> beans = new CsvToBeanBuilder(csvReader)
                     .withType(QuestionDto.class).withSeparator(';').withSkipLines(1).build().parse();
