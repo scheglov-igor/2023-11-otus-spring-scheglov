@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class QuestionDtoMapperBootTest {
 
     @Autowired
-    QuestionDtoMapper questionDtoMapper;
+    private QuestionDtoMapper questionDtoMapper;
 
     @Test
     void toDomainObjectTest() {
