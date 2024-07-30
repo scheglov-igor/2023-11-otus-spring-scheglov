@@ -23,5 +23,3 @@ dependency-reduced-pom.xml
 /dist/
 /nbdist/
 /.nb-gradle/
-
-/spring-shell.log
