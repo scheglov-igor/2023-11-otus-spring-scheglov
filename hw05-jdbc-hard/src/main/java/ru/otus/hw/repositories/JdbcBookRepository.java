@@ -108,15 +108,13 @@ public class JdbcBookRepository implements BookRepository {
                                 List<BookGenreRelation> relations) {
 
         Map<Long, Genre> genresMap = genres.stream()
-                .collect(Collectors.toMap(Genre::getId, Function.identity()));
+                        .collect(Collectors.toMap(Genre::getId, Function.identity()));
 
-        booksWithoutGenres
-                .forEach(book -> book.setGenres(
-                        relations.stream()
-                                .filter(bookGenreRelation -> bookGenreRelation.bookId() == book.getId())
-                                .map(bookGenreRelation -> genresMap.get(bookGenreRelation.genreId))
-                                .collect(Collectors.toList())
-                ));
+        Map<Long, Book> booksMap = booksWithoutGenres.stream()
+                        .collect(Collectors.toMap(Book::getId, Function.identity()));
+
+        relations.forEach(bookGenreRelation ->
+                booksMap.get(bookGenreRelation.bookId).getGenres().add(genresMap.get(bookGenreRelation.genreId)));
 
     }
 
