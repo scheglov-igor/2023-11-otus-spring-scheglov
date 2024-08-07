@@ -74,10 +74,9 @@ public class JdbcBookRepository implements BookRepository {
 
     @Override
     public void deleteById(long id) {
-        Optional<Book> book = findById(id);
-        if (book.isPresent()) {
-            removeGenresRelationsFor(book.get());
-            jdbc.update("delete from books where id = :id", Map.of("id", id));
+        int updatedCount = jdbc.update("delete from books where id = :id", Map.of("id", id));
+        if (updatedCount == 0) {
+            throw new EntityNotFoundException("no book with id=%s".formatted(id));
         }
     }
 
