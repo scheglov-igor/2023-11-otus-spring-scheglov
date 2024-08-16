@@ -8,3 +8,9 @@ spring:
         web-allow-others: true
   flyway:
     enabled: true
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+    show-sql: true
