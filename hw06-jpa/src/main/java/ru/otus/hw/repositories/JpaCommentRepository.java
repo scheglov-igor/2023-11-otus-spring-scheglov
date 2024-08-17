@@ -24,12 +24,8 @@ public class JpaCommentRepository implements CommentRepository {
 
     @Override
     public List<Comment> findByBookId(Long bookId) {
-
-        var commentsGraph = em.getEntityGraph("commetns-entity-graph-with-books-authors");
-
         TypedQuery<Comment> query = em.createQuery("select c from Comment c where c.book.id = :bookId", Comment.class);
         query.setParameter("bookId", bookId);
-        query.setHint(FETCH.getKey(), commentsGraph);
         return query.getResultList();
     }
 

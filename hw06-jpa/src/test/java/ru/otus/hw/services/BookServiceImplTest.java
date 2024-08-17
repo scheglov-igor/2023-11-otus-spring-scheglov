@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Import({BookServiceImpl.class, JpaAuthorRepository.class, JpaGenreRepository.class, JpaBookRepository.class,
         JpaCommentRepository.class, BookConverter.class, AuthorConverter.class, GenreConverter.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BookServiceImplTest {
 
     @Autowired
@@ -69,6 +68,7 @@ class BookServiceImplTest {
 
     @DisplayName("должен сохранять новую книгу")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldSaveNewBook() {
         var expectedBook = new BookDto(4, "BookTitle_10500", authorDtoList.get(0), List.of(genreDtoList.get(0), genreDtoList.get(2)));
         var returnedBook = bookServiceImpl.insert(expectedBook.getTitle(), expectedBook.getAuthor().getId(),
@@ -85,6 +85,7 @@ class BookServiceImplTest {
 
     @DisplayName("должен сохранять измененную книгу")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldSaveUpdatedBook() {
         var expectedBook = new BookDto(1L, "BookTitle_10500", authorDtoList.get(2),
                 List.of(genreDtoList.get(4), genreDtoList.get(5)));
@@ -111,6 +112,7 @@ class BookServiceImplTest {
 
     @DisplayName("должен удалять книгу по id ")
     @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldDeleteBook() {
         var existingBook = bookServiceImpl.findById(1L);
         assertThat(existingBook).isPresent();

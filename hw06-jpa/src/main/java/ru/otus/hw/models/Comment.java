@@ -24,20 +24,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "comments")
-@NamedEntityGraph(
-        name = "commetns-entity-graph-with-books-authors",
-        attributeNodes = {
-                @NamedAttributeNode(value = "book", subgraph = "books-author")
-        },
-        subgraphs = {
-                @NamedSubgraph(
-                        name = "books-author",
-                        attributeNodes = {
-                                @NamedAttributeNode("author")
-                        }
-                )
-        }
-)
 public class Comment {
 
     @Id

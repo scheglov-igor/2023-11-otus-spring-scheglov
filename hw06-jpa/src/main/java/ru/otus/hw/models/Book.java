@@ -45,7 +45,6 @@ public class Book {
     @ToString.Exclude
     private Author author;
 
-    @Column
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "books_genres", joinColumns = @JoinColumn(name = "book_id"),
