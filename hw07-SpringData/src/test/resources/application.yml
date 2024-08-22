@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+  flyway:
+    enabled: true
+    locations: db/migration/1.0, db/migration/2.0, db/migration/testdata
