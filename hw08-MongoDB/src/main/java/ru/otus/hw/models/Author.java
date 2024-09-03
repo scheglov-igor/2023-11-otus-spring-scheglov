@@ -1,27 +1,24 @@
 package ru.otus.hw.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "authors")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "authors")
 public class Author {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    private String id;
 
-    @Column(name = "full_name")
+    //TODO В маппинге реляционных БД принято жестко прописывать названия полей @Column(name= "full_name")
+    // так как структура таблиц меняется реже, чем классы
+    // что будет хорошим тоном для nosql?
+    // как я понял, что тут наоборот правильно оставить как можно более гибкую структуру
+    // поэтому @Field(name = "full_name") не нужно
     private String fullName;
 }

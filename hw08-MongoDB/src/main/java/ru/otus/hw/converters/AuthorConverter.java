@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Component
 public class AuthorConverter {
     public String authorToString(AuthorDto author) {
-        return "Id: %d, FullName: %s".formatted(author.getId(), author.getFullName());
+        return "Id: %s, FullName: %s".formatted(author.getId(), author.getFullName());
     }
 
     public AuthorDto toDto(Author author) {

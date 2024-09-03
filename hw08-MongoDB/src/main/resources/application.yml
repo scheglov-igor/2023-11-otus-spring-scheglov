@@ -1,16 +1,23 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:maindb
-  h2:
-    console:
-      path: /h2-console
-      settings:
-        web-allow-others: true
-  flyway:
-    enabled: true
-  jpa:
-    generate-ddl: false
-    hibernate:
-      ddl-auto: none
+  data:
+    mongodb:
+      host: localhost
+      database: book_db
+  shell:
+    interactive:
+      enabled: true
 
-    show-sql: true
+mongock:
+  migration-scan-package:
+    - ru.otus.hw.migration
+  enabled: true
+  runner-type: initializingbean
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

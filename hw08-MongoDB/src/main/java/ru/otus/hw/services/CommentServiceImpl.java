@@ -24,32 +24,31 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<CommentDto> findById(long id) {
+    public Optional<CommentDto> findById(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         return comment.map(commentConverter::toDto);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommentDto> findByBookId(long bookId) {
+    public List<CommentDto> findByBookId(String bookId) {
         var commentList = commentRepository.findByBookId(bookId);
         return commentConverter.toDtoList(commentList);
     }
 
     @Transactional
     @Override
-    public CommentDto insertComment(long bookId, String commentText) {
-        return save(0L, commentText, bookId);
+    public CommentDto insertComment(String bookId, String commentText) {
+        return save(null, commentText, bookId);
     }
 
     @Transactional
     @Override
-    public CommentDto updateComment(long id, long bookId, String commentText) {
-        return save(id, commentText, bookId);
+    public CommentDto updateComment(String id, String bookId, String commentText) {
+       return save(id, commentText, bookId);
     }
 
-    private CommentDto save(long id, String commentText, long bookId) {
-
+    private CommentDto save(String id, String commentText, String bookId) {
         var book = bookRepository.findById(bookId);
         if (book.isEmpty()) {
             throw new EntityNotFoundException("Book with id=%s found".formatted(bookId));
@@ -60,7 +59,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public void deleteComment(long id) {
+    public void deleteComment(String id) {
         var comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             throw new EntityNotFoundException("No comment with id=%s".formatted(id));

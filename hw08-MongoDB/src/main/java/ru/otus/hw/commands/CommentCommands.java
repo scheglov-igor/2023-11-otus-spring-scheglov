@@ -18,15 +18,15 @@ public class CommentCommands {
 
     // cbid 1
     @ShellMethod(value = "Find comment by id", key = "cbid")
-    public String findCommentById(long id) {
+    public String findCommentById(String id) {
         return commentService.findById(id)
                 .map(commentConverter::commentToString)
-                .orElse("Comment with id %d not found".formatted(id));
+                .orElse("Comment with id %s not found".formatted(id));
     }
 
     // cbb 1
     @ShellMethod(value = "Find comments by book id", key = "cbb")
-    public String findCommentByBookId(long id) {
+    public String findCommentByBookId(String id) {
         return commentService.findByBookId(id).stream()
                 .map(commentConverter::commentToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
@@ -34,21 +34,23 @@ public class CommentCommands {
 
     // cins 1 new_comment
     @ShellMethod(value = "Comment insert", key = "cins")
-    public String createComment(Long bookId, String commentText) {
+    public String createComment(String bookId, String commentText) {
         var commentDto = commentService.insertComment(bookId, commentText);
         return commentConverter.commentToString(commentDto);
     }
 
+
     // cupd 1 2 changed_comment
     @ShellMethod(value = "Comment update", key = "cupd")
-    public String updateComment(Long id, Long bookId, String commentText) {
+    public String updateComment(String id, String bookId, String commentText) {
         var commentDto = commentService.updateComment(id, bookId, commentText);
         return commentConverter.commentToString(commentDto);
     }
 
+
     // cdel 1
     @ShellMethod(value = "Comment delete", key = "cdel")
-    public void deleteComment(Long id) {
+    public void deleteComment(String id) {
         commentService.deleteComment(id);
     }
 
