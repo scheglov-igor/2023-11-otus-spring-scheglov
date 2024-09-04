@@ -1,22 +1,26 @@
 package ru.otus.hw.repositories;
 
+import io.mongock.driver.mongodb.springdata.v4.config.SpringDataMongoV4Context;
+import io.mongock.runner.springboot.EnableMongock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе JPA для работы с жанрами ")
-@DataJpaTest
-class JpaGenreRepositoryTest {
+@DisplayName("Репозиторий на основе Mongo для работы с жанрами ")
+@DataMongoTest
+@EnableMongock
+@Import({SpringDataMongoV4Context.class})
+class MongoGenreRepositoryTest {
 
     @Autowired
     private GenreRepository repository;
@@ -25,7 +29,7 @@ class JpaGenreRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        dbGenres = getDbGenres();
+        dbGenres = StandartExpectedProvider.getDbGenres();
     }
 
     @DisplayName("должен загружать список всех жанров")
@@ -41,23 +45,14 @@ class JpaGenreRepositoryTest {
     @DisplayName("должен загружать список жанров c id=1 и id=3")
     @Test
     void shouldReturnCorrectSelectedGenresList() {
-        var actualGenres = repository.findByIdIn(Set.of(1L, 3L));
+        var actualGenres = repository.findByIdIn(Set.of("1", "3"));
         var expectedGenres = LongStream.of(1, 3)
                 .boxed()
-                .map(id -> new Genre(id, "Genre_" + id))
+                .map(id -> new Genre(id.toString(), "Genre_" + id))
                 .toList();
 
         assertThat(actualGenres).containsExactlyElementsOf(expectedGenres);
         expectedGenres.forEach(System.out::println);
     }
-
-
-    private static List<Genre> getDbGenres() {
-        return LongStream.range(1, 7).boxed()
-                .map(id -> new Genre(id, "Genre_" + id))
-                .toList();
-    }
-
-
 
 }

@@ -1,12 +1,14 @@
 package ru.otus.hw.services;
 
+import io.mongock.driver.mongodb.springdata.v4.config.SpringDataMongoV4Context;
+import io.mongock.runner.springboot.EnableMongock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,9 +25,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис для работы с комментариями ")
-@DataJpaTest
+@DataMongoTest
+@EnableMongock
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@Import({CommentServiceImpl.class, CommentConverter.class, BookConverter.class,
+@Import({SpringDataMongoV4Context.class, CommentServiceImpl.class, CommentConverter.class, BookConverter.class,
         AuthorConverter.class, GenreConverter.class})
 class CommentServiceImplTest {
 
@@ -55,7 +58,7 @@ class CommentServiceImplTest {
     @DisplayName("должен загружать список комментариев по id книги")
     @Test
     void shouldReturnCorrectBooksList() {
-        var actualComments = commentServiceImpl.findByBookId(1L);
+        var actualComments = commentServiceImpl.findByBookId("1");
         var expectedComments = List.of(
                 commentDtoList.get(0),
                 commentDtoList.get(1));
@@ -68,11 +71,14 @@ class CommentServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldSaveNewComment() {
-        var expectedComment = new CommentDto(4L, bookDtoList.get(0), "comment_10500");
-        var returnedComment = commentServiceImpl.insertComment(1, "comment_10500");
+        var expectedComment = new CommentDto("4", bookDtoList.get(0), "comment_10500");
+        var returnedComment = commentServiceImpl.insertComment("1", "comment_10500");
         assertThat(returnedComment).isNotNull()
-                .matches(comment -> comment.getId() > 0)
-                .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
+                .matches(comment -> !comment.getId().isEmpty())
+                .usingRecursiveComparison()
+                .ignoringExpectedNullFields()
+                .ignoringFields("id")
+                .isEqualTo(expectedComment);
 
         assertThat(commentServiceImpl.findById(returnedComment.getId()))
                 .isPresent()
@@ -84,7 +90,7 @@ class CommentServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldSaveUpdatedComment() {
-        var expectedComment = new CommentDto(1L, bookDtoList.get(0), "comment_100500");
+        var expectedComment = new CommentDto("1", bookDtoList.get(0), "comment_100500");
 
         assertThat(commentServiceImpl.findById(expectedComment.getId()))
                 .isPresent()
@@ -95,7 +101,7 @@ class CommentServiceImplTest {
                 expectedComment.getBook().getId(), expectedComment.getCommentText());
 
         assertThat(returnedComment).isNotNull()
-                .matches(comment -> comment.getId() > 0)
+                .matches(comment -> !comment.getId().isEmpty())
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
 
         assertThat(commentServiceImpl.findById(returnedComment.getId()))
@@ -108,10 +114,10 @@ class CommentServiceImplTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldDeleteComment() {
-        var existingComment = commentServiceImpl.findById(1L);
+        var existingComment = commentServiceImpl.findById("1");
         assertThat(existingComment).isPresent();
         commentServiceImpl.deleteComment(existingComment.get().getId());
-        assertThat(commentServiceImpl.findById(1L)).isEmpty();
+        assertThat(commentServiceImpl.findById("1")).isEmpty();
     }
 
 }

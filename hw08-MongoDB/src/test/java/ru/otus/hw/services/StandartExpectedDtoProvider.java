@@ -9,18 +9,17 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
-//TODO можно же в тестах так общие части вынести?
 public class StandartExpectedDtoProvider {
 
     public static List<AuthorDto> getAuthorDtoList() {
         return LongStream.range(1, 4).boxed()
-                .map(id -> new AuthorDto(id, "Author_" + id))
+                .map(id -> new AuthorDto(id.toString(), "Author_" + id))
                 .toList();
     }
 
     public static List<GenreDto> getGenreDtoList() {
         return LongStream.range(1, 7).boxed()
-                .map(id -> new GenreDto(id, "Genre_" + id))
+                .map(id -> new GenreDto(id.toString(), "Genre_" + id))
                 .toList();
     }
 
@@ -32,7 +31,7 @@ public class StandartExpectedDtoProvider {
 
     public static List<BookDto> getBookDtoList(List<AuthorDto> authorDtoList, List<GenreDto> genreDtoList) {
         return IntStream.range(1, 4).boxed()
-                .map(id -> new BookDto(id.longValue(),
+                .map(id -> new BookDto(id.toString(),
                         "BookTitle_" + id,
                         authorDtoList.get(id - 1),
                         genreDtoList.subList((id - 1) * 2, (id - 1) * 2 + 2)
@@ -44,18 +43,18 @@ public class StandartExpectedDtoProvider {
 
         var bookDtoList = StandartExpectedDtoProvider.getBookDtoList();
         return List.of(
-                new CommentDto(1L, bookDtoList.get(0), "comment_1"),
-                new CommentDto(2L, bookDtoList.get(0), "comment_2"),
-                new CommentDto(3L, bookDtoList.get(2), "comment_3")
+                new CommentDto("1", bookDtoList.get(0), "comment_1"),
+                new CommentDto("2", bookDtoList.get(0), "comment_2"),
+                new CommentDto("3", bookDtoList.get(1), "comment_3")
         );
     }
 
     public static List<CommentDto> getCommentDtoList(List<BookDto> bookDtoList) {
 
         return List.of(
-                new CommentDto(1L, bookDtoList.get(0), "comment_1"),
-                new CommentDto(2L, bookDtoList.get(0), "comment_2"),
-                new CommentDto(3L, bookDtoList.get(2), "comment_3")
+                new CommentDto("1", bookDtoList.get(0), "comment_1"),
+                new CommentDto("2", bookDtoList.get(0), "comment_2"),
+                new CommentDto("3", bookDtoList.get(3), "comment_3")
         );
     }
 

@@ -12,6 +12,10 @@ mongock:
     - ru.otus.hw.migration
   enabled: true
   runner-type: initializingbean
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
 
 logging:
   level:

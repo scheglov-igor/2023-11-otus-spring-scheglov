@@ -22,21 +22,39 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
-@ChangeUnit(id="init-all", order = "001", author = "schiv")
+@ChangeUnit(id = "init-all", order = "001", author = "schiv")
 @RequiredArgsConstructor
 public class InitDb {
     private final AuthorRepository authorRepository;
+
     private final GenreRepository genreRepository;
+
     private final BookRepository bookRepository;
+
     private final CommentRepository commentRepository;
 
     private final MongoOperations mongoTemplate;
 
     @BeforeExecution
     public void createIndex() {
-        mongoTemplate.indexOps(Author.class).ensureIndex(new Index().named("author_fullName_index").on("fullName", Sort.Direction.ASC).unique());
-        mongoTemplate.indexOps(Genre.class).ensureIndex(new Index().named("genre_name_index").on("name", Sort.Direction.ASC).unique());
-        mongoTemplate.indexOps(Book.class).ensureIndex(new Index().named("book_title_index").on("title", Sort.Direction.ASC).unique());
+
+        mongoTemplate.indexOps(Author.class)
+                .ensureIndex(new Index()
+                        .named("author_fullName_index")
+                        .on("fullName", Sort.Direction.ASC)
+                        .unique());
+
+        mongoTemplate.indexOps(Genre.class)
+                .ensureIndex(new Index()
+                        .named("genre_name_index")
+                        .on("name", Sort.Direction.ASC)
+                        .unique());
+
+        mongoTemplate.indexOps(Book.class)
+                .ensureIndex(new Index()
+                        .named("book_title_index")
+                        .on("title", Sort.Direction.ASC)
+                        .unique());
     }
 
     @RollbackBeforeExecution
@@ -59,6 +77,7 @@ public class InitDb {
                 .map(id -> new Author(id.toString(), "Author_" + id))
                 .toList();
     }
+
     private static List<Genre> getDbGenres() {
         return LongStream.range(1, 7).boxed()
                 .map(id -> new Genre(id.toString(), "Genre_" + id))

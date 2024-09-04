@@ -1,21 +1,26 @@
 package ru.otus.hw.repositories;
 
+import io.mongock.driver.mongodb.springdata.v4.config.SpringDataMongoV4Context;
+import io.mongock.runner.springboot.EnableMongock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе JPA для работы с авторами ")
-@DataJpaTest
-class JpaAuthorRepositoryTest {
+@DisplayName("Репозиторий на основе Mongo для работы с авторами ")
+@DataMongoTest
+@EnableMongock
+@Import({SpringDataMongoV4Context.class})
+//TODO единственный способ, которым смог запустить миграцию
+// https://github.com/mongock/mongock/issues/551
+class MongoAuthorRepositoryTest {
 
     @Autowired
     private AuthorRepository repository;
@@ -24,7 +29,7 @@ class JpaAuthorRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        dbAuthors = getDbAuthors();
+        dbAuthors = StandartExpectedProvider.getDbAuthors();
     }
 
     @DisplayName("должен загружать список всех авторов")
@@ -40,16 +45,11 @@ class JpaAuthorRepositoryTest {
     @DisplayName("должен загружать автора c id=3")
     @Test
     void shouldReturnCorrectAuthor() {
-        var actualAuthor = repository.findById(3L);
-        var expectedAuthor = new Author(3L, "Author_3");
+        var actualAuthor = repository.findById("3");
+        var expectedAuthor = new Author("3", "Author_3");
 
         assertThat(actualAuthor.orElse(null)).isEqualTo(expectedAuthor);
     }
 
-    private static List<Author> getDbAuthors() {
-        return LongStream.range(1, 4).boxed()
-                .map(id -> new Author(id, "Author_" + id))
-                .toList();
-    }
 
 }
