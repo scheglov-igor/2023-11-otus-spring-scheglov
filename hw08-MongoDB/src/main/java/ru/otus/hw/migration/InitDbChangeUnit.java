@@ -24,7 +24,7 @@ import java.util.stream.LongStream;
 
 @ChangeUnit(id = "init-all", order = "001", author = "schiv")
 @RequiredArgsConstructor
-public class InitDb {
+public class InitDbChangeUnit {
     private final AuthorRepository authorRepository;
 
     private final GenreRepository genreRepository;

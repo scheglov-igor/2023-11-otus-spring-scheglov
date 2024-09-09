@@ -8,7 +8,6 @@ import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
-import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -66,8 +65,7 @@ public class BookServiceImpl implements BookService {
         if (book.isEmpty()) {
             throw new EntityNotFoundException("Book with id=%s found".formatted(id));
         }
-        List<Comment> commentsList = commentRepository.findByBookId(id);
-        commentRepository.deleteAll(commentsList);
+        commentRepository.deleteByBookId(id);
         bookRepository.delete(book.get());
     }
 

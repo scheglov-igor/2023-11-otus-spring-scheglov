@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "comments")
 @Data
@@ -20,9 +21,11 @@ public class Comment {
     private String id;
 
     @DBRef
+    @Field(name = "book")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Book book;
 
+    @Field(name = "comment_text")
     private String commentText;
 }
