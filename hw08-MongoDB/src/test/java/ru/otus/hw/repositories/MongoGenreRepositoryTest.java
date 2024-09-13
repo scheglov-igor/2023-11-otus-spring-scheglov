@@ -1,13 +1,10 @@
 package ru.otus.hw.repositories;
 
-import io.mongock.driver.mongodb.springdata.v4.config.SpringDataMongoV4Context;
-import io.mongock.runner.springboot.EnableMongock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
+import ru.otus.hw.AbstractMongoTest;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
@@ -17,10 +14,7 @@ import java.util.stream.LongStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Mongo для работы с жанрами ")
-@DataMongoTest
-@EnableMongock
-@Import({SpringDataMongoV4Context.class})
-class MongoGenreRepositoryTest {
+class MongoGenreRepositoryTest extends AbstractMongoTest {
 
     @Autowired
     private GenreRepository repository;

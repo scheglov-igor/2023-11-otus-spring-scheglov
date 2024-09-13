@@ -1,18 +1,16 @@
 package ru.otus.hw.services;
 
-import io.mongock.driver.mongodb.springdata.v4.config.SpringDataMongoV4Context;
-import io.mongock.runner.springboot.EnableMongock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.AbstractMongoTest;
 import ru.otus.hw.converters.AuthorConverter;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.converters.CommentConverter;
@@ -25,12 +23,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Сервис для работы с комментариями ")
-@DataMongoTest
-@EnableMongock
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@Import({SpringDataMongoV4Context.class, CommentServiceImpl.class, CommentConverter.class, BookConverter.class,
+@Import({CommentServiceImpl.class, CommentConverter.class, BookConverter.class,
         AuthorConverter.class, GenreConverter.class})
-class CommentServiceImplTest {
+class CommentServiceImplTest extends AbstractMongoTest {
 
     @Autowired
     private CommentServiceImpl commentServiceImpl;

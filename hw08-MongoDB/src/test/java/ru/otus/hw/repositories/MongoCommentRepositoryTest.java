@@ -1,7 +1,5 @@
 package ru.otus.hw.repositories;
 
-import io.mongock.driver.mongodb.springdata.v4.config.SpringDataMongoV4Context;
-import io.mongock.runner.springboot.EnableMongock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,29 +7,32 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.AbstractMongoTest;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Mongo для работы с комментариями ")
 @DataMongoTest
-@EnableMongock
-@Import({SpringDataMongoV4Context.class})
-class MongoCommentRepositoryTest {
+class MongoCommentRepositoryTest extends AbstractMongoTest {
 
     @Autowired
     private CommentRepository repository;
+
+    //TODO Idea почему-то пишет ошибку на mongoOperations
+    // Could not autowire. No beans of 'MongoOperations' type found.
+    // но работает
+    // в прошлом ДЗ на TestEntityManager тоже ругается...
+    @Autowired
+    private MongoOperations mongoOperations;
 
     private List<Author> dbAuthors;
 
@@ -81,7 +82,7 @@ class MongoCommentRepositoryTest {
                 .matches(comment -> !comment.getId().isEmpty())
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
 
-        assertThat(repository.findById(returnedComment.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedComment.getId(), Comment.class)))
                 .isPresent()
                 .get()
                 .isEqualTo(returnedComment);
@@ -94,7 +95,8 @@ class MongoCommentRepositoryTest {
     void shouldSaveUpdatedComment() {
         var expectedComment = new Comment("1", dbBooks.get(0), "comment_100500");
 
-        assertThat(repository.findById(expectedComment.getId()))
+        assertThat(
+                Optional.ofNullable(mongoOperations.findById(expectedComment.getId(), Comment.class)))
                 .isPresent()
                 .get()
                 .isNotEqualTo(expectedComment);
@@ -105,10 +107,13 @@ class MongoCommentRepositoryTest {
                 .matches(comment -> !comment.getId().isEmpty())
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
 
-        assertThat(repository.findById(returnedComment.getId()))
+        assertThat(
+                Optional.ofNullable(mongoOperations.findById(returnedComment.getId(), Comment.class)))
                 .isPresent()
                 .get()
                 .isEqualTo(returnedComment);
+
+
     }
 
     @DisplayName("должен удалять комментарий по id ")
