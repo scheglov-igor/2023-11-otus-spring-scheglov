@@ -7,12 +7,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -22,6 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Репозиторий на основе JPA для работы с комментариями ")
 @DataJpaTest
 class JpaCommentRepositoryTest {
+
+    @Autowired
+    private TestEntityManager em;
 
     @Autowired
     private CommentRepository repository;
@@ -73,7 +79,7 @@ class JpaCommentRepositoryTest {
                 .matches(comment -> comment.getId() > 0)
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
 
-        assertThat(repository.findById(returnedComment.getId()))
+        assertThat(Optional.ofNullable(em.find(Comment.class, returnedComment.getId())))
                 .isPresent()
                 .get()
                 .isEqualTo(returnedComment);
@@ -85,7 +91,7 @@ class JpaCommentRepositoryTest {
     void shouldSaveUpdatedComment() {
         var expectedComment = new Comment(1L, dbBooks.get(0), "comment_100500");
 
-        assertThat(repository.findById(expectedComment.getId()))
+        assertThat(Optional.ofNullable(em.find(Comment.class, expectedComment.getId())))
                 .isPresent()
                 .get()
                 .isNotEqualTo(expectedComment);
@@ -96,7 +102,7 @@ class JpaCommentRepositoryTest {
                 .matches(comment -> comment.getId() > 0)
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
 
-        assertThat(repository.findById(returnedComment.getId()))
+        assertThat(Optional.ofNullable(em.find(Comment.class, returnedComment.getId())))
                 .isPresent()
                 .get()
                 .isEqualTo(returnedComment);
@@ -109,7 +115,7 @@ class JpaCommentRepositoryTest {
         var existingComment = repository.findById(1L);
         assertThat(existingComment).isPresent();
         repository.delete(existingComment.get());
-        assertThat(repository.findById(1L)).isEmpty();
+        assertThat(em.find(Comment.class,1L)).isNull();
     }
 
     private static List<Author> getDbAuthors() {
