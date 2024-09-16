@@ -61,10 +61,6 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void deleteComment(long id) {
-        var comment = commentRepository.findById(id);
-        if (comment.isEmpty()) {
-            throw new EntityNotFoundException("No comment with id=%s".formatted(id));
-        }
-        commentRepository.delete(comment.get());
+       commentRepository.deleteById(id);
     }
 }
