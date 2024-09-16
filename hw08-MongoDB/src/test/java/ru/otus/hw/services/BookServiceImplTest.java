@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,11 @@ import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.GenreDto;
+import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +33,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BookServiceImplTest extends AbstractMongoTest {
 
     @Autowired
+    private MongoOperations mongoOperations;
+
+    @Autowired
     private BookServiceImpl bookServiceImpl;
+
+    @Autowired
+    private BookConverter bookConverter;
 
     private List<AuthorDto> authorDtoList;
 
@@ -79,8 +89,9 @@ class BookServiceImplTest extends AbstractMongoTest {
                 .ignoringFields("id")
                 .isEqualTo(expectedBook);
 
-        assertThat(bookServiceImpl.findById(returnedBook.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedBook.getId(), Book.class)))
                 .isPresent()
+                .map(comment -> bookConverter.toDto(comment))
                 .get()
                 .isEqualTo(returnedBook);
     }
@@ -106,8 +117,9 @@ class BookServiceImplTest extends AbstractMongoTest {
                 .matches(book -> !book.getId().isEmpty())
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
 
-        assertThat(bookServiceImpl.findById(returnedBook.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedBook.getId(), Book.class)))
                 .isPresent()
+                .map(comment -> bookConverter.toDto(comment))
                 .get()
                 .isEqualTo(returnedBook);
     }
@@ -116,11 +128,10 @@ class BookServiceImplTest extends AbstractMongoTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldDeleteBook() {
-        System.out.println("############ shouldDeleteBook");
-        var existingBook = bookServiceImpl.findById("1");
+        var existingBook = Optional.ofNullable(mongoOperations.findById("1", Book.class));
         assertThat(existingBook).isPresent();
         bookServiceImpl.deleteById(existingBook.get().getId());
-        assertThat(bookServiceImpl.findById("1")).isEmpty();
+        assertThat(Optional.ofNullable(mongoOperations.findById("1", Book.class))).isEmpty();
     }
 
 }

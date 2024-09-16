@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,10 @@ import ru.otus.hw.converters.CommentConverter;
 import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CommentDto;
+import ru.otus.hw.models.Comment;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,8 +32,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CommentServiceImplTest extends AbstractMongoTest {
 
     @Autowired
+    private MongoOperations mongoOperations;
+
+    @Autowired
     private CommentServiceImpl commentServiceImpl;
+
+    @Autowired
+    private CommentConverter commentConverter;
+
     private List<BookDto> bookDtoList;
+
     private List<CommentDto> commentDtoList;
 
     @BeforeEach
@@ -53,7 +64,7 @@ class CommentServiceImplTest extends AbstractMongoTest {
 
     @DisplayName("должен загружать список комментариев по id книги")
     @Test
-    void shouldReturnCorrectBooksList() {
+    void shouldReturnCorrectCommentsList() {
         var actualComments = commentServiceImpl.findByBookId("1");
         var expectedComments = List.of(
                 commentDtoList.get(0),
@@ -76,8 +87,9 @@ class CommentServiceImplTest extends AbstractMongoTest {
                 .ignoringFields("id")
                 .isEqualTo(expectedComment);
 
-        assertThat(commentServiceImpl.findById(returnedComment.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedComment.getId(), Comment.class)))
                 .isPresent()
+                .map(comment -> commentConverter.toDto(comment))
                 .get()
                 .isEqualTo(returnedComment);
     }
@@ -100,8 +112,9 @@ class CommentServiceImplTest extends AbstractMongoTest {
                 .matches(comment -> !comment.getId().isEmpty())
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
 
-        assertThat(commentServiceImpl.findById(returnedComment.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedComment.getId(), Comment.class)))
                 .isPresent()
+                .map(comment -> commentConverter.toDto(comment))
                 .get()
                 .isEqualTo(returnedComment);
     }
@@ -110,10 +123,11 @@ class CommentServiceImplTest extends AbstractMongoTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldDeleteComment() {
-        var existingComment = commentServiceImpl.findById("1");
+        var existingComment = Optional.ofNullable(mongoOperations.findById("1", Comment.class));
         assertThat(existingComment).isPresent();
         commentServiceImpl.deleteComment(existingComment.get().getId());
         assertThat(commentServiceImpl.findById("1")).isEmpty();
+        assertThat(Optional.ofNullable(mongoOperations.findById("1", Comment.class))).isEmpty();
     }
 
 }
