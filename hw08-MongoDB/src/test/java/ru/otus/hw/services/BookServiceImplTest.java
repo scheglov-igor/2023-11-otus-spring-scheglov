@@ -103,7 +103,7 @@ class BookServiceImplTest extends AbstractMongoTest {
         var expectedBook = new BookDto("1", "BookTitle_10500", authorDtoList.get(2),
                 List.of(genreDtoList.get(4), genreDtoList.get(5)));
 
-        assertThat(bookServiceImpl.findById(expectedBook.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(expectedBook.getId(), Book.class)))
                 .isPresent()
                 .get()
                 .isNotEqualTo(expectedBook);
@@ -131,7 +131,8 @@ class BookServiceImplTest extends AbstractMongoTest {
         var existingBook = Optional.ofNullable(mongoOperations.findById("1", Book.class));
         assertThat(existingBook).isPresent();
         bookServiceImpl.deleteById(existingBook.get().getId());
-        assertThat(Optional.ofNullable(mongoOperations.findById("1", Book.class))).isEmpty();
+        assertThat(Optional.ofNullable(mongoOperations.findById(existingBook.get().getId(), Book.class)))
+                .isEmpty();
     }
 
 }

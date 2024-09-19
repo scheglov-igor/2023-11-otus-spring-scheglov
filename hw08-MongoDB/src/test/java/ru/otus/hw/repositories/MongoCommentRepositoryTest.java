@@ -120,10 +120,11 @@ class MongoCommentRepositoryTest extends AbstractMongoTest {
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldDeleteComment() {
-        var existingComment = repository.findById("1");
+        var existingComment = Optional.ofNullable(mongoOperations.findById("1", Comment.class));
         assertThat(existingComment).isPresent();
         repository.delete(existingComment.get());
-        assertThat(repository.findById("1")).isEmpty();
+        assertThat(Optional.ofNullable(mongoOperations.findById(existingComment.get().getId(), Comment.class)))
+                .isEmpty();
     }
 
 

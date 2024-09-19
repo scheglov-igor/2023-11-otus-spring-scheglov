@@ -100,7 +100,7 @@ class CommentServiceImplTest extends AbstractMongoTest {
     void shouldSaveUpdatedComment() {
         var expectedComment = new CommentDto("1", bookDtoList.get(0), "comment_100500");
 
-        assertThat(commentServiceImpl.findById(expectedComment.getId()))
+        assertThat(Optional.ofNullable(mongoOperations.findById(expectedComment.getId(), Comment.class)))
                 .isPresent()
                 .get()
                 .isNotEqualTo(expectedComment);
@@ -126,8 +126,8 @@ class CommentServiceImplTest extends AbstractMongoTest {
         var existingComment = Optional.ofNullable(mongoOperations.findById("1", Comment.class));
         assertThat(existingComment).isPresent();
         commentServiceImpl.deleteComment(existingComment.get().getId());
-        assertThat(commentServiceImpl.findById("1")).isEmpty();
-        assertThat(Optional.ofNullable(mongoOperations.findById("1", Comment.class))).isEmpty();
+        assertThat(Optional.ofNullable(mongoOperations.findById(existingComment.get().getId(), Comment.class)))
+                .isEmpty();
     }
 
 }
