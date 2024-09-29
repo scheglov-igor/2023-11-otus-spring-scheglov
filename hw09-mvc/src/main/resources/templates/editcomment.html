@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>One Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+            /*padding-inline-start: 10px;*/
+        }
+
+        .bookValue {
+            display: inline-block;
+            font-weight: bold;
+
+            width: 100px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        h3 {
+            padding: 2px;
+            padding-left: 10px;
+        }
+        .errors {
+            color: red;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div style="text-align: right">
+    <b th:text="#{lang-switcher-header}">Select language</b>:
+    <a href="#" th:href="@{''(lang=en)}" th:text="#{en-lang-switch-button-caption}">Language - EN</a>
+    |
+    <a href="#" th:href="@{''(lang=ru)}" th:text="#{ru-lang-switch-button-caption}">Language - RU</a>
+</div>
+
+<div><a th:href="@{/}" href="listbook.html" th:text="#{all-books-button-caption}">All</a></div>
+
+<form id="edit-form" action="editcomment.html" th:action="@{/comments/save}" th:method="post" th:object="${comment}">
+
+    <h3 th:text="#{book-field-comments} + ':'">Comments</h3>
+
+    <div class="row">
+        <label for="comment-id-input" th:text="#{field-id} + ':'">ID:</label>
+        <input id="comment-id-input" type="text" readonly="readonly" name="id" class="bookValue"
+               th:value="*{id}" value="1"/>
+    </div>
+
+    <div class="row">
+        <label for="comment-book-input" th:text="#{book-show-header} + ':'">ID:</label>
+        <input id="comment-book-input" type="text" readonly="readonly" name="bookId" class="bookValue"
+               th:value="*{bookId}" value="1"/>
+    </div>
+
+
+    <div class="row">
+        <label for="book-comment-input" th:text="#{book-field-comment} + ':'">commentText:</label>
+        <input id="book-comment-input" name="commentText" type="text" class="bookValue"
+               th:value="*{commentText}" value="Comment1"/>
+        <div class="errors" th:if="${#fields.hasErrors('commentText')}" th:errors="*{commentText}">Wrong comment error</div>
+    </div>
+
+    <div class="row">
+        <button type="submit" th:text="#{save-button-caption}">Save</button>
+        <a href="listbook.html" th:href="@{/}">
+            <button type="button" th:text="#{cancel-button-caption}">Cancel</button>
+        </a>
+    </div>
+
+</form>
+
+</body>
+</html>

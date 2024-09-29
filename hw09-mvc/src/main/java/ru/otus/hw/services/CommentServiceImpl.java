@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.CommentConverter;
 import ru.otus.hw.dto.CommentDto;
+import ru.otus.hw.dto.CommentFormDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Comment;
 import ru.otus.hw.repositories.BookRepository;
@@ -27,6 +28,13 @@ public class CommentServiceImpl implements CommentService {
     public Optional<CommentDto> findById(String id) {
         Optional<Comment> comment = commentRepository.findById(id);
         return comment.map(commentConverter::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<CommentFormDto> findFormDtoById(String id) {
+        var comment = commentRepository.findById(id);
+        return comment.map(commentConverter::toFormDto);
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +63,23 @@ public class CommentServiceImpl implements CommentService {
         }
         var comment = new Comment(id, book.get(), commentText);
         return commentConverter.toDto(commentRepository.save(comment));
+    }
+
+    @Transactional
+    @Override
+    public CommentDto save(CommentFormDto commentFormDto) {
+        var book = bookRepository.findById(commentFormDto.getBookId());
+        if (book.isEmpty()) {
+            throw new EntityNotFoundException("Book with id=%s found".formatted(commentFormDto.getBookId()));
+        }
+
+        String id = commentFormDto.getId();
+        if (id != null && id.isEmpty()) {
+            id = null;
+        }
+        var comment = commentRepository.save(new Comment(id, book.get(), commentFormDto.getCommentText()));
+        return commentConverter.toDto(comment);
+
     }
 
     @Transactional

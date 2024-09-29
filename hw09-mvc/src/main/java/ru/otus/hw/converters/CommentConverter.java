@@ -3,6 +3,7 @@ package ru.otus.hw.converters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.otus.hw.dto.CommentDto;
+import ru.otus.hw.dto.CommentFormDto;
 import ru.otus.hw.models.Comment;
 
 import java.util.List;
@@ -21,6 +22,13 @@ public class CommentConverter {
 
     public CommentDto toDto(Comment comment) {
         return new CommentDto(comment.getId(), bookConverter.toDto(comment.getBook()), comment.getCommentText());
+    }
+
+    public CommentFormDto toFormDto(Comment comment) {
+        return new CommentFormDto(
+                comment.getId(),
+                comment.getBook().getId(),
+                comment.getCommentText());
     }
 
     public List<CommentDto> toDtoList(List<Comment> commentList) {

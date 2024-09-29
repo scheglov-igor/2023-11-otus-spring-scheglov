@@ -18,6 +18,7 @@ import ru.otus.hw.converters.CommentConverter;
 import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CommentDto;
+import ru.otus.hw.dto.CommentFormDto;
 import ru.otus.hw.models.Comment;
 
 import java.util.List;
@@ -62,6 +63,18 @@ class CommentServiceImplTest extends AbstractMongoTest {
                 .isEqualTo(expectedComment);
     }
 
+    @DisplayName("должен загружать комментарий по id (FormDto)")
+    @ParameterizedTest
+    @MethodSource("ru.otus.hw.services.StandartExpectedDtoProvider#getCommentFormDtoList")
+    void shouldReturnCorrectCommentFormDtoById(CommentFormDto expectedComment) {
+        var actualComment = commentServiceImpl.findFormDtoById(expectedComment.getId());
+        System.out.println("actualComment = " + actualComment);
+        System.out.println("expectedComment = " + expectedComment);
+        assertThat(actualComment).isPresent()
+                .get()
+                .isEqualTo(expectedComment);
+    }
+
     @DisplayName("должен загружать список комментариев по id книги")
     @Test
     void shouldReturnCorrectCommentsList() {
@@ -94,10 +107,59 @@ class CommentServiceImplTest extends AbstractMongoTest {
                 .isEqualTo(returnedComment);
     }
 
+
+    @DisplayName("должен сохранять новый комментарий (FormDto)")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void shouldSaveNewCommentFormDto() {
+        var newComment = new CommentFormDto("", "1", "comment_10500");
+        var expectedComment = new CommentDto("4", bookDtoList.get(0), "comment_10500");
+        var returnedComment = commentServiceImpl.save(newComment);
+        assertThat(returnedComment).isNotNull()
+                .matches(comment -> !comment.getId().isEmpty())
+                .usingRecursiveComparison()
+                .ignoringExpectedNullFields()
+                .ignoringFields("id")
+                .isEqualTo(expectedComment);
+
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedComment.getId(), Comment.class)))
+                .isPresent()
+                .map(comment -> commentConverter.toDto(comment))
+                .get()
+                .isEqualTo(returnedComment);
+    }
+
+
     @DisplayName("должен сохранять измененный комментарий")
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldSaveUpdatedComment() {
+        var expectedComment = new CommentDto("1", bookDtoList.get(0), "comment_100500");
+
+        assertThat(Optional.ofNullable(mongoOperations.findById(expectedComment.getId(), Comment.class)))
+                .isPresent()
+                .get()
+                .isNotEqualTo(expectedComment);
+
+        var returnedComment = commentServiceImpl.updateComment(expectedComment.getId(),
+                expectedComment.getBook().getId(), expectedComment.getCommentText());
+
+        assertThat(returnedComment).isNotNull()
+                .matches(comment -> !comment.getId().isEmpty())
+                .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedComment);
+
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedComment.getId(), Comment.class)))
+                .isPresent()
+                .map(comment -> commentConverter.toDto(comment))
+                .get()
+                .isEqualTo(returnedComment);
+    }
+
+    @DisplayName("должен сохранять измененный комментарий (FormDto)")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void shouldSaveUpdatedCommentFormDto() {
+        var savedComment = new CommentFormDto("1", "1", "comment_10500");
         var expectedComment = new CommentDto("1", bookDtoList.get(0), "comment_100500");
 
         assertThat(Optional.ofNullable(mongoOperations.findById(expectedComment.getId(), Comment.class)))

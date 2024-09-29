@@ -3,9 +3,6 @@ spring:
     mongodb:
       host: localhost
       database: book_db
-  shell:
-    interactive:
-      enabled: true
 
 mongock:
   migration-scan-package:
@@ -19,6 +16,7 @@ mongock:
 
 logging:
   level:
+    ROOT: info
     org:
       springframework:
         data:

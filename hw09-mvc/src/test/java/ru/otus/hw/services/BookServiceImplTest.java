@@ -17,12 +17,13 @@ import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.converters.GenreConverter;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
+import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.dto.GenreDto;
 import ru.otus.hw.models.Book;
-import ru.otus.hw.models.Comment;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,6 +66,17 @@ class BookServiceImplTest extends AbstractMongoTest {
                 .isEqualTo(expectedBook);
     }
 
+    @DisplayName("должен загружать книгу (FormDto) по id")
+    @ParameterizedTest
+    @MethodSource("ru.otus.hw.services.StandartExpectedDtoProvider#getBookFormDtoList")
+    void shouldReturnCorrectFormDtoBookById(BookFormDto expectedBook) {
+        System.out.println("############ shouldReturnCorrectBookById");
+        var actualBook = bookServiceImpl.findFormDtoById(expectedBook.getId());
+        assertThat(actualBook).isPresent()
+                .get()
+                .isEqualTo(expectedBook);
+    }
+
     @DisplayName("должен загружать список всех книг")
     @Test
     void shouldReturnCorrectBooksList() {
@@ -96,6 +108,29 @@ class BookServiceImplTest extends AbstractMongoTest {
                 .isEqualTo(returnedBook);
     }
 
+    @DisplayName("должен сохранять новую книгу (BookFormDto)")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void shouldSaveNewBookFormDto() {
+        var newBook = new BookFormDto("", "BookTitle_10500", String.valueOf(1), Set.of(String.valueOf(1), String.valueOf(3)));
+        var expectedBook = new BookDto("4", "BookTitle_10500", authorDtoList.get(0), List.of(genreDtoList.get(0), genreDtoList.get(2)));
+
+        var returnedBook = bookServiceImpl.save(newBook);
+
+        assertThat(returnedBook).isNotNull()
+                .matches(book -> !book.getId().isEmpty())
+                .usingRecursiveComparison()
+                .ignoringExpectedNullFields()
+                .ignoringFields("id")
+                .isEqualTo(expectedBook);
+
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedBook.getId(), Book.class)))
+                .isPresent()
+                .map(comment -> bookConverter.toDto(comment))
+                .get()
+                .isEqualTo(returnedBook);
+    }
+
     @DisplayName("должен сохранять измененную книгу")
     @Test
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
@@ -112,6 +147,32 @@ class BookServiceImplTest extends AbstractMongoTest {
                 expectedBook.getId(), expectedBook.getTitle(), expectedBook.getAuthor().getId(),
                 expectedBook.getGenres().stream().map(GenreDto::getId).collect(Collectors.toSet())
         );
+
+        assertThat(returnedBook).isNotNull()
+                .matches(book -> !book.getId().isEmpty())
+                .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
+
+        assertThat(Optional.ofNullable(mongoOperations.findById(returnedBook.getId(), Book.class)))
+                .isPresent()
+                .map(comment -> bookConverter.toDto(comment))
+                .get()
+                .isEqualTo(returnedBook);
+    }
+
+    @DisplayName("должен сохранять измененную книгу (BookFormDto)")
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
+    void shouldSaveUpdatedBookFormDto() {
+        var bookFormDto = new BookFormDto("1", "BookTitle_10500", String.valueOf(3), Set.of(String.valueOf(5), String.valueOf(6)));
+        var expectedBook = new BookDto("1", "BookTitle_10500", authorDtoList.get(2),
+                List.of(genreDtoList.get(4), genreDtoList.get(5)));
+
+        assertThat(Optional.ofNullable(mongoOperations.findById(expectedBook.getId(), Book.class)))
+                .isPresent()
+                .get()
+                .isNotEqualTo(expectedBook);
+
+        var returnedBook = bookServiceImpl.save(bookFormDto);
 
         assertThat(returnedBook).isNotNull()
                 .matches(book -> !book.getId().isEmpty())

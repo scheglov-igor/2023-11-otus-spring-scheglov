@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.dto.BookDto;
+import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
@@ -37,6 +38,13 @@ public class BookServiceImpl implements BookService {
     public Optional<BookDto> findById(String id) {
         var book = bookRepository.findById(id);
         return book.map(bookConverter::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<BookFormDto> findFormDtoById(String id) {
+        var book = bookRepository.findById(id);
+        return book.map(bookConverter::toFormDto);
     }
 
     @Override
@@ -86,5 +94,33 @@ public class BookServiceImpl implements BookService {
         } catch (DuplicateKeyException e) {
             throw new IllegalArgumentException("Duplicate book title: %s".formatted(title), e);
         }
+    }
+
+
+    @Override
+    @Transactional
+    public BookDto save(BookFormDto bookFormDto) {
+
+        var author = authorRepository.findById(bookFormDto.getAuthorId())
+                .orElseThrow(() -> new EntityNotFoundException("Author with id %s not found"
+                        .formatted(bookFormDto.getAuthorId())));
+
+        var genres = genreRepository.findByIdIn(bookFormDto.getGenreIds());
+        if (isEmpty(genres) || bookFormDto.getGenreIds().size() != genres.size()) {
+            throw new EntityNotFoundException("One or all genres with ids %s not found"
+                    .formatted(bookFormDto.getGenreIds()));
+        }
+
+        try {
+            String id = bookFormDto.getId();
+            if (id != null && id.isEmpty()) {
+                id = null;
+            }
+            var  book = bookRepository.save(new Book(id, bookFormDto.getTitle(), author, genres));
+            return bookConverter.toDto(book);
+        } catch (DuplicateKeyException e) {
+            throw new IllegalArgumentException("Duplicate book title: %s".formatted(bookFormDto.getTitle()), e);
+        }
+
     }
 }
