@@ -112,7 +112,10 @@
                 <a th:href="@{/comments/edit/__${comment.id}__}" href="editcomment.html" th:text="#{edit-button-caption}">Edit</a>
             </td>
             <td>
-                <a th:href="@{/comments/delete/__${comment.id}__(bookid=${book.id})}" href="editcomment.html" th:text="#{delete-button-caption}">Edit</a>
+                <form action="#" th:action="@{/comments/delete/__${comment.id}__}" th:method="post" >
+                    <input type="text" name="bookid" th:value="${book.id}" hidden/>
+                    <button type="submit" id="submitButton" th:text="#{delete-button-caption}">Delete</button>
+                </form>
             </td>
         </tr>
     </table>

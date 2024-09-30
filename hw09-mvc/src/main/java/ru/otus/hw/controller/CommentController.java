@@ -53,7 +53,7 @@ public class CommentController {
         return "redirect:/books/%s".formatted(comment.getBookId());
     }
 
-    @GetMapping("/comments/delete/{id}")
+    @PostMapping("/comments/delete/{id}")
     public String deleteCommentById(@PathVariable(required = false) String id,
                                     @RequestParam(name = "bookid") String bookId) {
 

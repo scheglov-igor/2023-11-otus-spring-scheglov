@@ -97,7 +97,7 @@ public class BookContoller {
         return "redirect:/books/%s".formatted(savedBook.getId());
     }
 
-    @GetMapping("/books/delete/{id}")
+    @PostMapping("/books/delete/{id}")
     public String deleteBookById(@PathVariable(required = false) String id) {
         bookService.deleteById(id);
         return "redirect:/books";

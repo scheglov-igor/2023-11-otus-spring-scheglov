@@ -50,7 +50,7 @@
 
 <div><a th:href="@{/}" href="listbook.html" th:text="#{all-books-button-caption}">All</a></div>
 
-<form id="edit-form" action="editbook.html" th:action="@{/books/save}" th:method="post" th:object="${book}">
+<form id="edit-form" action="showbook.html" th:action="@{/books/save}" th:method="post" th:object="${book}">
 
     <h3 th:text="#{book-show-header}">Book:</h3>
 

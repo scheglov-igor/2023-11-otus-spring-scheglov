@@ -51,7 +51,7 @@
 
 <div><a th:href="@{/}" href="listbook.html" th:text="#{all-books-button-caption}">All</a></div>
 
-<form id="edit-form" action="editcomment.html" th:action="@{/comments/save}" th:method="post" th:object="${comment}">
+<form id="edit-form" action="showbook.html" th:action="@{/comments/save}" th:method="post" th:object="${comment}">
 
     <h3 th:text="#{book-field-comments} + ':'">Comments</h3>
 
