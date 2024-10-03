@@ -153,7 +153,7 @@ public class BookControllerTests {
     @Test
     public void testDeleteBookById() throws Exception {
 
-        mockMvc.perform(get("/books/delete/1"))
+        mockMvc.perform(post("/books/delete/1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/books"));
     }

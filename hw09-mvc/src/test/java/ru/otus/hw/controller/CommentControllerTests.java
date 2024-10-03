@@ -109,7 +109,7 @@ public class CommentControllerTests {
     @Test
     public void testDeleteCommentById() throws Exception {
 
-        mockMvc.perform(get("/comments/delete/1?bookid=1"))
+        mockMvc.perform(post("/comments/delete/1?bookid=1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/books/1"));
     }
