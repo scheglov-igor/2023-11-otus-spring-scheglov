@@ -9,8 +9,6 @@ import ru.otus.hw.models.Comment;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.data.jpa.repository.EntityGraph.EntityGraphType.FETCH;
-
 @Repository
 @RequiredArgsConstructor
 public class JpaCommentRepository implements CommentRepository {
