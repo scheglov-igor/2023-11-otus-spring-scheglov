@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.otus.hw.controller.page.BookContoller;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
@@ -21,8 +22,6 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -57,8 +56,7 @@ public class BookControllerTests {
 
         mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("listbook"))
-                .andExpect(model().attributeExists("bookDtoList"));
+                .andExpect(view().name("listbook"));
     }
 
     @Test
@@ -108,54 +106,6 @@ public class BookControllerTests {
                 .andExpect(model().attributeExists("book"))
                 .andExpect(model().attributeExists("authors"))
                 .andExpect(model().attributeExists("genres"));
-    }
-
-
-    @Test
-    void testSaveBook() throws Exception {
-
-        given(bookService.save(any()))
-                .willReturn(getBook());
-
-        this.mockMvc
-                .perform(post("/books/save")
-                        .param("id", "1")
-                        .param("title", "TestTitle")
-                        .param("authorId", "1")
-                        .param("genreIds", "1")
-                )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/books/1"));
-    }
-
-    @Test
-    void testSaveBookReturnValidation() throws Exception {
-
-        given(bookService.save(any()))
-                .willReturn(getBook());
-
-        this.mockMvc
-                .perform(post("/books/save")
-                        .param("id", "")
-                        .param("title", "")
-                        .param("authorId", "")
-                        .param("genreIds", "")
-                )
-                .andExpect(status().isOk())
-                .andExpect(view().name("editbook"))
-                .andExpect(model().attributeExists("book"))
-                .andExpect(model().attributeHasErrors("book"))
-                .andExpect(model().attributeErrorCount("book", 3))
-                .andExpect(model().attributeExists("authors"))
-                .andExpect(model().attributeExists("genres"));
-    }
-
-    @Test
-    public void testDeleteBookById() throws Exception {
-
-        mockMvc.perform(post("/books/delete/1"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/books"));
     }
 
 }

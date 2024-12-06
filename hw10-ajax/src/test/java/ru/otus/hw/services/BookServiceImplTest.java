@@ -115,7 +115,7 @@ class BookServiceImplTest extends AbstractMongoTest {
         var newBook = new BookFormDto("", "BookTitle_10500", String.valueOf(1), Set.of(String.valueOf(1), String.valueOf(3)));
         var expectedBook = new BookDto("4", "BookTitle_10500", authorDtoList.get(0), List.of(genreDtoList.get(0), genreDtoList.get(2)));
 
-        var returnedBook = bookServiceImpl.save(newBook);
+        var returnedBook = bookServiceImpl.insert(newBook);
 
         assertThat(returnedBook).isNotNull()
                 .matches(book -> !book.getId().isEmpty())
@@ -172,7 +172,7 @@ class BookServiceImplTest extends AbstractMongoTest {
                 .get()
                 .isNotEqualTo(expectedBook);
 
-        var returnedBook = bookServiceImpl.save(bookFormDto);
+        var returnedBook = bookServiceImpl.update(bookFormDto);
 
         assertThat(returnedBook).isNotNull()
                 .matches(book -> !book.getId().isEmpty())

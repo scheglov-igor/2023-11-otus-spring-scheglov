@@ -23,6 +23,10 @@
             width: 50px;
         }
 
+        .trComment {
+            background-color: lightgray;
+        }
+
         h3 {
             padding: 2px;
             padding-left: 30px;
@@ -57,37 +61,161 @@
         <th th:text="#{book-field-title}">title</th>
         <th th:text="#{book-field-author}">author</th>
         <th th:text="#{book-field-genres}">genres</th>
-        <th th:text="#{book-field-comments}">Action</th>
-        <th th:text="#{edit-button-caption}">Action</th>
+        <th th:text="#{show-button-caption}">Action</th>
         <th th:text="#{delete-button-caption}">Action</th>
+        <th th:text="#{book-field-comments}">Action</th>
     </tr>
     </thead>
 
-    <tbody>
-    <tr th:each="book : ${bookDtoList}">
-        <td th:text="${book.id}">1</td>
-        <td th:text="${book.title}">Book Name</td>
-        <td th:text="${book.author.fullName}">author</td>
-        <td>
-            <ul th:each="genre : ${book.genres}">
-                <li th:text="${genre.name}">genre</li>
-            </ul>
-        </td>
-        <td>
-            <a th:href="@{/books/__${book.id}__}" href="showbook.html" th:text="#{show-button-caption}">Show</a>
-        </td>
-        <td>
-            <a th:href="@{/books/edit/__${book.id}__}" href="editbook.html" th:text="#{edit-button-caption}">Edit</a>
-        </td>
-        <td>
-            <form action="listbook.html" th:action="@{/books/delete/__${book.id}__}" th:method="post" >
-                <button type="submit" id="submitButton" th:text="#{delete-button-caption}">Delete</button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
+    <tbody id="tbody-books"/>
+
 </table>
+
 <div><a href="editbook.html"  th:href="@{/books/new}" th:text="#{add-button-caption}">Add</a></div>
 
+<script>
+
+    window.onload = function () {
+        loadBooks();
+    };
+
+
+    function loadBooks() {
+        const containerElement = document.getElementById("tbody-books");
+        fetch("/api/book")
+            .then(response => response.json())
+            .then(jsonData  => {
+                console.log(jsonData);
+                renderBooksJSONToTable(jsonData, containerElement);
+            });
+    }
+
+
+    function renderBooksJSONToTable(jsonData, containerElement) {
+        jsonData.forEach((item) => {
+            console.log(item);
+            renderBookTableTd(item, containerElement);
+        });
+    }
+
+
+    function renderBookTableTd(item, containerElement) {
+
+        let tr = document.createElement("tr");
+
+        let td = document.createElement("td");
+        td.innerText = item.id;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerText = item.title;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        td.innerText = item.author.fullName;
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        let ul = document.createElement("ul");
+        item.genres.forEach((genreItem) => {
+            let li = document.createElement("li");
+            li.innerText = genreItem.name;
+            ul.appendChild(li);
+        });
+        td.appendChild(ul);
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        let showA = document.createElement("a");
+        let showButton = document.createElement('button');
+        showButton.innerHTML = 'Show book';
+        showA.appendChild(showButton);
+        showA.href = "/books/"+item.id;
+        td.appendChild(showA);
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        let deleteButton = document.createElement('button');
+        deleteButton.innerHTML = 'Delete';
+        let deleteClickHandler = function () {
+            console.log('Click just happened' + item.id);
+            deleteBook(item.id, tr);
+        }
+        deleteButton.addEventListener('click', deleteClickHandler)
+        td.appendChild(deleteButton);
+        tr.appendChild(td);
+
+        td = document.createElement("td");
+        let commentButton = document.createElement('button');
+        commentButton.innerHTML = 'Show';
+        commentButton.classList.add('show');
+        let commentClickHandler = function () {
+            console.log('Click just happened' + item.id);
+            loadComments(item.id, td, commentButton);
+        }
+        commentButton.addEventListener('click', commentClickHandler)
+        td.appendChild(commentButton);
+        tr.appendChild(td);
+
+        containerElement.appendChild(tr);
+    }
+
+
+    function loadComments(bookId, td, button) {
+        console.log(bookId);
+        console.log(td);
+        console.log();
+
+        if(button.classList.contains("show")) {
+            fetch("/api/comment?bookId="+bookId)
+                .then(response => response.json())
+                .then(jsonData => {
+                    console.log(jsonData);
+                    renderCommentTD(jsonData, td);
+                    button.classList.remove('show');
+                    button.classList.add('hide');
+                    button.innerHTML = 'Hide';
+                });
+        } else if(button.classList.contains("hide")) {
+            removeCommentTD(td);
+            button.classList.remove('hide');
+            button.classList.add('show');
+            button.innerHTML = 'Show';
+        }
+    }
+
+
+    function removeCommentTD(td) {
+        td.nextElementSibling.remove();
+    }
+
+
+    function renderCommentTD(jsonData, td) {
+        let tdComment = document.createElement("tdComment");
+        let tableComment = document.createElement("table");
+        jsonData.forEach((item) => {
+            let trComment = document.createElement("tr");
+            let tdId = document.createElement("td");
+            tdId.innerText = item.id;
+            trComment.appendChild(tdId);
+            let tdText = document.createElement("td");
+            tdText.innerText = item.commentText;
+            trComment.appendChild(tdText);
+            tableComment.appendChild(trComment);
+        });
+        tdComment.appendChild(tableComment);
+        td.parentNode.insertBefore(tdComment, td.nextSibling);
+    }
+
+
+    function deleteBook(bookId, tr) {
+        console.log(bookId);
+        console.log(tr);
+        fetch("/api/book/"+bookId,
+            {method: 'DELETE'})
+            .then(tr.remove());
+    }
+
+</script>
 </body>
 </html>

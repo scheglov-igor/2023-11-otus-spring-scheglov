@@ -68,6 +68,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    public BookDto insert(BookFormDto bookFormDto) {
+        return save(null, bookFormDto.getTitle(), bookFormDto.getAuthorId(), bookFormDto.getGenreIds());
+    }
+
+    @Override
+    @Transactional
+    public BookDto update(BookFormDto bookFormDto) {
+        return save(bookFormDto.getId(), bookFormDto.getTitle(), bookFormDto.getAuthorId(), bookFormDto.getGenreIds());
+    }
+
+    @Override
+    @Transactional
     public void deleteById(String id) {
         if (id.isEmpty()) {
             throw new IllegalArgumentException("Book id must not be null");
@@ -97,30 +109,5 @@ public class BookServiceImpl implements BookService {
     }
 
 
-    @Override
-    @Transactional
-    public BookDto save(BookFormDto bookFormDto) {
 
-        var author = authorRepository.findById(bookFormDto.getAuthorId())
-                .orElseThrow(() -> new EntityNotFoundException("Author with id %s not found"
-                        .formatted(bookFormDto.getAuthorId())));
-
-        var genres = genreRepository.findByIdIn(bookFormDto.getGenreIds());
-        if (isEmpty(genres) || bookFormDto.getGenreIds().size() != genres.size()) {
-            throw new EntityNotFoundException("One or all genres with ids %s not found"
-                    .formatted(bookFormDto.getGenreIds()));
-        }
-
-        try {
-            String id = bookFormDto.getId();
-            if (id != null && id.isEmpty()) {
-                id = null;
-            }
-            var  book = bookRepository.save(new Book(id, bookFormDto.getTitle(), author, genres));
-            return bookConverter.toDto(book);
-        } catch (DuplicateKeyException e) {
-            throw new IllegalArgumentException("Duplicate book title: %s".formatted(bookFormDto.getTitle()), e);
-        }
-
-    }
 }

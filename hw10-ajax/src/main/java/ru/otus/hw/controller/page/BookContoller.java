@@ -1,15 +1,10 @@
-package ru.otus.hw.controller;
+package ru.otus.hw.controller.page;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.services.AuthorService;
@@ -36,13 +31,10 @@ public class BookContoller {
     }
 
     @GetMapping("/books")
-    public String findAllBooks(Model model) {
-
-        var bookDtoList = bookService.findAll();
-        model.addAttribute("bookDtoList", bookDtoList);
-
+    public String getBooks() {
         return "listbook";
     }
+
 
     @GetMapping("/books/{id}")
     public String findBookById(@PathVariable String id,
@@ -78,25 +70,4 @@ public class BookContoller {
         return "editbook";
     }
 
-    @PostMapping("/books/save")
-    public String saveBook(@Valid @ModelAttribute("book") BookFormDto book,
-                           BindingResult bindingResult,
-                           ModelMap model) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("authors", authorService.findAll());
-            model.addAttribute("genres", genreService.findAll());
-            return "editbook";
-        }
-
-        var savedBook = bookService.save(book);
-
-        return "redirect:/books/%s".formatted(savedBook.getId());
-    }
-
-    @PostMapping("/books/delete/{id}")
-    public String deleteBookById(@PathVariable(required = false) String id) {
-        bookService.deleteById(id);
-        return "redirect:/books";
-    }
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.otus.hw.controller.page.CommentController;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CommentFormDto;
 import ru.otus.hw.services.CommentService;

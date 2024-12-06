@@ -18,7 +18,9 @@ public interface BookService {
 
     BookDto update(String id, String title, String authorId, Set<String> genresIds);
 
-    BookDto save(BookFormDto bookRequestPojo);
+    BookDto insert(BookFormDto bookRequestPojo);
+
+    BookDto update(BookFormDto bookRequestPojo);
 
     void deleteById(String id);
 }
