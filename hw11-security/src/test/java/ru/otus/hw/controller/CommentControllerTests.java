@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.otus.hw.config.SecurityConfig;
 import ru.otus.hw.controller.page.CommentController;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CommentFormDto;
@@ -15,14 +18,17 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(CommentController.class)
+@Import(SecurityConfig.class)
 public class CommentControllerTests {
     @Autowired
     private MockMvc mockMvc;
@@ -37,6 +43,10 @@ public class CommentControllerTests {
         return new CommentFormDto("1", "1","Comment");
     }
 
+    @WithMockUser(
+            username = "user",
+            authorities = {"ROLE_USER"}
+    )
     @Test
     public void testGetEditBook() throws Exception {
 
@@ -49,6 +59,10 @@ public class CommentControllerTests {
                 .andExpect(model().attributeExists("comment"));
     }
 
+    @WithMockUser(
+            username = "user",
+            authorities = {"ROLE_USER"}
+    )
     @Test
     public void testException() throws Exception {
 
@@ -61,7 +75,10 @@ public class CommentControllerTests {
                 .andExpect(model().attributeExists("exceptionMessage"));
     }
 
-
+    @WithMockUser(
+            username = "user",
+            authorities = {"ROLE_USER"}
+    )
     @Test
     public void testGetAddComment() throws Exception {
 
@@ -72,6 +89,10 @@ public class CommentControllerTests {
     }
 
 
+    @WithMockUser(
+            username = "user",
+            authorities = {"ROLE_USER"}
+    )
     @Test
     void testSavComment() throws Exception {
 
@@ -80,14 +101,19 @@ public class CommentControllerTests {
 
         this.mockMvc
                 .perform(post("/comments/save")
-                    .param("id", "1")
-                    .param("bookId", "1")
-                    .param("commentText", "Comment")
+                        .param("id", "1")
+                        .param("bookId", "1")
+                        .param("commentText", "Comment")
+                        .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/books/1"));
     }
 
+    @WithMockUser(
+            username = "user",
+            authorities = {"ROLE_USER"}
+    )
     @Test
     void testSaveCommentReturnValidation() throws Exception {
 
@@ -99,6 +125,7 @@ public class CommentControllerTests {
                         .param("id", "")
                         .param("bookId", "")
                         .param("commentText", "")
+                        .with(csrf())
                 )
                 .andExpect(status().isOk())
                 .andExpect(view().name("editcomment"))
@@ -107,12 +134,22 @@ public class CommentControllerTests {
                 .andExpect(model().attributeErrorCount("comment", 2));
     }
 
+    @WithMockUser(
+            username = "user",
+            authorities = {"ROLE_USER"}
+    )
     @Test
     public void testDeleteCommentById() throws Exception {
 
-        mockMvc.perform(post("/comments/delete/1?bookid=1"))
+        mockMvc.perform(post("/comments/delete/1?bookid=1").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/books/1"));
     }
 
+    @Test
+    public void testSecurityException() throws Exception {
+        mockMvc.perform(get("/comments/new?bookid=1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost/login"));
+    }
 }
