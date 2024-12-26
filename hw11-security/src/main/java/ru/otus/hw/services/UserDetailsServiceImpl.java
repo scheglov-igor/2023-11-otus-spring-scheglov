@@ -6,8 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.otus.hw.converters.UserPrincipal;
-import ru.otus.hw.models.User;
+import ru.otus.hw.models.LibraryUser;
 import ru.otus.hw.repositories.UserRepository;
 
 @Service
@@ -19,10 +18,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        LibraryUser user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new UserPrincipal(user);
+        return user;
     }
 }

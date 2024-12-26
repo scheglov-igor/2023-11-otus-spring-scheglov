@@ -1,39 +1,44 @@
-package ru.otus.hw.converters;
+package ru.otus.hw.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.otus.hw.models.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class UserPrincipal implements UserDetails {
+@Document(collection = "users")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class LibraryUser implements UserDetails {
 
+    @Id
+    private String id;
 
-    private final User user;
+    @Field(name = "username")
+    private String username;
 
-    public UserPrincipal(User user) {
-        this.user = user;
-    }
+    @Field(name = "password")
+    private String password;
 
-    @Override
-    public String getUsername() {
-        return user.getUsername();
-    }
+    @Field(name = "role")
+    private List<String> roles;
 
-    @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
+    @Field(name = "enabled")
+    private Boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         final List<GrantedAuthority> authorities = new ArrayList<>();
-        user.getRoles()
-                .forEach(role -> authorities.add(new SimpleGrantedAuthority(role)));
+        getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())));
         return authorities;
     }
 
@@ -57,7 +62,4 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    public User getUser() {
-        return user;
-    }
 }

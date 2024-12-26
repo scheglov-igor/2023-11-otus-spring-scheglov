@@ -1,7 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
     <title>One Book</title>
     <style type="text/css">
         body {
@@ -68,15 +71,20 @@
                 httpMethod = 'PUT';
             }
 
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
             fetch("/api/book", {
                 method: httpMethod,
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
                 },
-                body: JSON.stringify(book)})
-                .then(rawResponse => processBookResponse(rawResponse));
-            }
+                body: JSON.stringify(book)
+            })
+            .then(rawResponse => processBookResponse(rawResponse));
+        }
 
         function processBookResponse(rawResponse) {
 

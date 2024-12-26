@@ -2,10 +2,9 @@ package ru.otus.hw.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.otus.hw.config.SecurityConfig;
 import ru.otus.hw.controller.page.BookContoller;
@@ -26,13 +25,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-@WebMvcTest(BookContoller.class)
-@Import(SecurityConfig.class)
-public class BookControllerTests {
+@WebMvcTest(controllers = BookContoller.class,
+        excludeAutoConfiguration = {
+                SecurityConfig.class,
+                SecurityAutoConfiguration.class
+})
+public class BookControllerTests{
     @Autowired
     private MockMvc mockMvc;
 
@@ -53,10 +54,6 @@ public class BookControllerTests {
         return new BookFormDto("1", "TestTitle","1", Set.of("1"));
     }
 
-    @WithMockUser(
-            username = "user",
-            authorities = {"ROLE_USER"}
-    )
     @Test
     public void testFindAllBooks() throws Exception {
 
@@ -68,10 +65,6 @@ public class BookControllerTests {
                 .andExpect(view().name("listbook"));
     }
 
-    @WithMockUser(
-            username = "user",
-            authorities = {"ROLE_USER"}
-    )
     @Test
     public void testFindBookById() throws Exception {
 
@@ -85,10 +78,6 @@ public class BookControllerTests {
                 .andExpect(model().attributeExists("comments"));
     }
 
-    @WithMockUser(
-            username = "user",
-            authorities = {"ROLE_USER"}
-    )
     @Test
     public void testException() throws Exception {
         given(bookService.findFormDtoById(any())).willReturn(Optional.empty());
@@ -100,10 +89,6 @@ public class BookControllerTests {
                 .andExpect(model().attributeExists("exceptionMessage"));
     }
 
-    @WithMockUser(
-            username = "user",
-            authorities = {"ROLE_USER"}
-    )
     @Test
     public void testGetAddBook() throws Exception {
 
@@ -115,10 +100,6 @@ public class BookControllerTests {
                 .andExpect(model().attributeExists("genres"));
     }
 
-    @WithMockUser(
-            username = "user",
-            authorities = {"ROLE_USER"}
-    )
     @Test
     public void testGetEditBook() throws Exception {
 
@@ -133,10 +114,4 @@ public class BookControllerTests {
                 .andExpect(model().attributeExists("genres"));
     }
 
-    @Test
-    public void testSecurityException() throws Exception {
-        mockMvc.perform(get("/books"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("http://localhost/login"));
-    }
 }

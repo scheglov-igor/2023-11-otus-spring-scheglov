@@ -10,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.index.Index;
 import ru.otus.hw.models.Book;
-import ru.otus.hw.models.User;
+import ru.otus.hw.models.LibraryUser;
 import ru.otus.hw.repositories.UserRepository;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class UpdateDb02AddUser {
     @BeforeExecution
     public void createIndex() {
 
-        mongoTemplate.indexOps(User.class)
+        mongoTemplate.indexOps(LibraryUser.class)
                 .ensureIndex(new Index()
                         .named("user_username_index")
                         .on("username", Sort.Direction.ASC)
@@ -43,13 +43,13 @@ public class UpdateDb02AddUser {
         var users = userRepository.saveAll(getDbUsers());
     }
 
-    private static List<User> getDbUsers() {
+    private static List<LibraryUser> getDbUsers() {
         return List.of(
-                new User(
+                new LibraryUser(
                         null,
                         "user",
                         "{bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG",
-                        List.of("user"),
+                        List.of("USER"),
                         true)
         );
     }
