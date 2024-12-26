@@ -2,6 +2,12 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+
+    <meta name="show-button-caption" th:content="#{show-button-caption}"/>
+    <meta name="delete-button-caption" th:content="#{delete-button-caption}"/>
+
     <title>List of all Books</title>
     <style type="text/css">
         body {
@@ -61,7 +67,7 @@
         <th th:text="#{book-field-title}">title</th>
         <th th:text="#{book-field-author}">author</th>
         <th th:text="#{book-field-genres}">genres</th>
-        <th th:text="#{show-button-caption}">Action</th>
+        <th th:text="#{book-show-header}">Action</th>
         <th th:text="#{delete-button-caption}">Action</th>
         <th th:text="#{book-field-comments}">Action</th>
     </tr>
@@ -101,6 +107,9 @@
 
     function renderBookTableTd(item, containerElement) {
 
+        const showButtonCaption = document.querySelector('meta[name="show-button-caption"]').getAttribute('content');
+        const deleteButtonCaption = document.querySelector('meta[name="delete-button-caption"]').getAttribute('content');
+
         let tr = document.createElement("tr");
 
         let td = document.createElement("td");
@@ -128,7 +137,7 @@
         td = document.createElement("td");
         let showA = document.createElement("a");
         let showButton = document.createElement('button');
-        showButton.innerHTML = 'Show book';
+        showButton.innerHTML = showButtonCaption;
         showA.appendChild(showButton);
         showA.href = "/books/"+item.id;
         td.appendChild(showA);
@@ -136,7 +145,7 @@
 
         td = document.createElement("td");
         let deleteButton = document.createElement('button');
-        deleteButton.innerHTML = 'Delete';
+        deleteButton.innerHTML = deleteButtonCaption;
         let deleteClickHandler = function () {
             console.log('Click just happened' + item.id);
             deleteBook(item.id, tr);
@@ -147,7 +156,7 @@
 
         td = document.createElement("td");
         let commentButton = document.createElement('button');
-        commentButton.innerHTML = 'Show';
+        commentButton.innerHTML = showButtonCaption;
         commentButton.classList.add('show');
         let commentClickHandler = function () {
             console.log('Click just happened' + item.id);
@@ -211,9 +220,17 @@
     function deleteBook(bookId, tr) {
         console.log(bookId);
         console.log(tr);
-        fetch("/api/book/"+bookId,
-            {method: 'DELETE'})
-            .then(tr.remove());
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch("/api/book/"+bookId, {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(tr.remove());
     }
 
 </script>
