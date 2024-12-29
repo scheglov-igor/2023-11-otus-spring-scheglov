@@ -50,6 +50,12 @@ public class UpdateDb02AddUser {
                         "user",
                         "{bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG",
                         List.of("USER"),
+                        true),
+                new LibraryUser(
+                        null,
+                        "admin",
+                        "{bcrypt}$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG",
+                        List.of("USER", "ADMIN"),
                         true)
         );
     }

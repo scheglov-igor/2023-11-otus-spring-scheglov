@@ -2,6 +2,7 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.BookConverter;
@@ -56,30 +57,35 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional
+    @Secured({ "ROLE_ADMIN" })
     public BookDto insert(String title, String authorId, Set<String> genresIds) {
         return save(null, title, authorId, genresIds);
     }
 
     @Override
     @Transactional
+    @Secured({ "ROLE_ADMIN" })
     public BookDto update(String id, String title, String authorId, Set<String> genresIds) {
         return save(id, title, authorId, genresIds);
     }
 
     @Override
     @Transactional
+    @Secured({ "ROLE_ADMIN" })
     public BookDto insert(BookFormDto bookFormDto) {
         return save(null, bookFormDto.getTitle(), bookFormDto.getAuthorId(), bookFormDto.getGenreIds());
     }
 
     @Override
     @Transactional
+    @Secured({ "ROLE_ADMIN" })
     public BookDto update(BookFormDto bookFormDto) {
         return save(bookFormDto.getId(), bookFormDto.getTitle(), bookFormDto.getAuthorId(), bookFormDto.getGenreIds());
     }
 
     @Override
     @Transactional
+    @Secured({ "ROLE_ADMIN" })
     public void deleteById(String id) {
         if (id.isEmpty()) {
             throw new IllegalArgumentException("Book id must not be null");

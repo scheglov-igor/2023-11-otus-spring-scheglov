@@ -47,6 +47,10 @@
     <a href="#" th:href="@{''(lang=en)}" th:text="#{en-lang-switch-button-caption}">Language - EN</a>
     |
     <a href="#" th:href="@{''(lang=ru)}" th:text="#{ru-lang-switch-button-caption}">Language - RU</a>
+    |
+    <a href="/logout" th:href="@{/logout}">
+        <button type="button" th:text="#{logout-button-caption}">выход</button>
+    </a>
 </div>
 
 <div><a th:href="@{/}" href="listbook.html" th:text="#{all-books-button-caption}">All</a></div>
