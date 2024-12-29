@@ -16,12 +16,15 @@ public class CommentRestControllerSecurityTest extends AbstractControllersSecuri
 
     public static Stream<Arguments> getSecurityTestData() {
         System.out.println("Impementation of ABSTRACT!!!!");
-        var roles = new String[]{"USER"};
+        var roleUser = new String[]{"USER"};
+        var roleAdmin = new String[] {"ADMIN"};
         return Stream.of(
                 Arguments.of("get", "/api/comment/1", null, null, null, 302, true),
-                Arguments.of("get", "/api/comment/1", null, "user", roles, 200, false),
+                Arguments.of("get", "/api/comment/1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/api/comment/1", null, "admin", roleAdmin, 200, false),
                 Arguments.of("get", "/api/comment?bookId=1", null, null, null, 302, true),
-                Arguments.of("get", "/api/comment?bookId=1", null, "user", roles, 200, false)
+                Arguments.of("get", "/api/comment?bookId=1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/api/comment?bookId=1", null, "admin", roleAdmin, 200, false)
         );
     }
 }

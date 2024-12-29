@@ -30,21 +30,27 @@ public class BookRestControllerSecurityTest extends AbstractControllersSecurityT
     public static Stream<Arguments> getSecurityTestData() {
         System.out.println("Impementation of ABSTRACT!!!!");
 
-        var roles = new String[]{"USER"};
+        var roleUser = new String[]{"USER"};
+        var roleAdmin = new String[] {"ADMIN"};
 
         String content = "{\"id\":null,\"title\":\"TestTitle\",\"authorId\":\"1\",\"genreIds\":[\"1\"]}";
 
         return Stream.of(
                 Arguments.of("get", "/api/book", null, null, null, 302, true),
-                Arguments.of("get", "/api/book", null, "user", roles, 200, false),
+                Arguments.of("get", "/api/book", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/api/book", null, "admin", roleAdmin, 200, false),
                 Arguments.of("get", "/api/book/1", null, null, null, 302, true),
-                Arguments.of("get", "/api/book/1", null, "user", roles, 200, false),
+                Arguments.of("get", "/api/book/1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/api/book/1", null, "admin", roleAdmin, 200, false),
                 Arguments.of("post", "/api/book", content, null, null, 302, true),
-                Arguments.of("post", "/api/book", content, "user", roles, 200, false),
+                Arguments.of("post", "/api/book", content, "user", roleUser, 403, false),
+                Arguments.of("post", "/api/book", content, "admin", roleAdmin, 200, false),
                 Arguments.of("put", "/api/book", content, null, null, 302, true),
-                Arguments.of("put", "/api/book", content, "user", roles, 200, false),
+                Arguments.of("put", "/api/book", content, "user", roleUser, 403, false),
+                Arguments.of("put", "/api/book", content, "admin", roleAdmin, 200, false),
                 Arguments.of("delete", "/api/book/1", null, null, null, 302, true),
-                Arguments.of("delete", "/api/book/1", null, "user", roles, 200, false)
+                Arguments.of("delete", "/api/book/1", null, "user", roleUser, 403, false),
+                Arguments.of("delete", "/api/book/1", null, "admin", roleAdmin, 200, false)
         );
     }
 }

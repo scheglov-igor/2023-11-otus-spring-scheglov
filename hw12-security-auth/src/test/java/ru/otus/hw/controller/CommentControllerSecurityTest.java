@@ -16,16 +16,21 @@ public class CommentControllerSecurityTest extends AbstractControllersSecurityTe
 
     public static Stream<Arguments> getSecurityTestData() {
         System.out.println("Impementation of ABSTRACT!!!!");
-        var roles = new String[]{"USER"};
+        var roleUser = new String[]{"USER"};
+        var roleAdmin = new String[] {"ADMIN"};
         return Stream.of(
                 Arguments.of("get", "/comments/edit/1", null, null, null, 302, true),
-                Arguments.of("get", "/comments/edit/1", null, "user", roles, 200, false),
+                Arguments.of("get", "/comments/edit/1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/comments/edit/1", null, "admin", roleAdmin, 200, false),
                 Arguments.of("get", "/comments/new?bookid=1", null, null, null, 302, true),
-                Arguments.of("get", "/comments/new?bookid=1", null, "user", roles, 200, false),
+                Arguments.of("get", "/comments/new?bookid=1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/comments/new?bookid=1", null, "admin", roleAdmin, 200, false),
                 Arguments.of("post", "/comments/save", null, null, null, 302, true),
-                Arguments.of("post", "/comments/save", null, "user", roles, 200, false),
+                Arguments.of("post", "/comments/save", null, "user", roleUser, 200, false),
+                Arguments.of("post", "/comments/save", null, "admin", roleAdmin, 200, false),
                 Arguments.of("post", "/comments/delete/1?bookid=1", null, null, null, 302, true),
-                Arguments.of("post", "/comments/delete/1?bookid=1", null, "user", roles, 302, false)
+                Arguments.of("post", "/comments/delete/1?bookid=1", null, "user", roleUser, 302, false),
+                Arguments.of("post", "/comments/delete/1?bookid=1", null, "admin", roleAdmin, 302, false)
         );
     }
 }

@@ -24,16 +24,21 @@ public class BookControllerSecurityTest extends AbstractControllersSecurityTest{
     private GenreService genreService;
 
     public static Stream<Arguments> getSecurityTestData() {
-        var roles = new String[] {"USER"};
+        var roleUser = new String[] {"USER"};
+        var roleAdmin = new String[] {"ADMIN"};
         return Stream.of(
                 Arguments.of("get", "/books", null, null, null, 302, true),
-                Arguments.of("get", "/books", null, "user", roles, 200, false),
+                Arguments.of("get", "/books", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/books", null, "admin", roleAdmin, 200, false),
                 Arguments.of("get", "/books/1", null, null, null, 302, true),
-                Arguments.of("get", "/books/1", null, "user", roles, 200, false),
+                Arguments.of("get", "/books/1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/books/1", null, "admin", roleAdmin, 200, false),
                 Arguments.of("get", "/books/new", null, null, null, 302, true),
-                Arguments.of("get", "/books/new", null, "user", roles, 200, false),
+                Arguments.of("get", "/books/new", null, "user", roleUser, 403, false),
+                Arguments.of("get", "/books/new", null, "admin", roleAdmin, 200, false),
                 Arguments.of("get", "/books/edit/1", null, null, null, 302, true),
-                Arguments.of("get", "/books/edit/1", null, "user", roles, 200, false)
+                Arguments.of("get", "/books/edit/1", null, "user", roleUser, 403, false),
+                Arguments.of("get", "/books/edit/1", null, "admin", roleAdmin, 200, false)
         );
     }
 }
