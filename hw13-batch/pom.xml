@@ -27,7 +27,7 @@
             https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml
         </checkstyle.config.url>
         <reflections.version>0.10.2</reflections.version>
-        <mongock.version>5.4.4</mongock.version>
+        <mongock.version>5.5.0</mongock.version>
         <flapdoodle.version>4.16.1</flapdoodle.version>
     </properties>
 
