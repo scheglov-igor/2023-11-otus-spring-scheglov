@@ -3,11 +3,19 @@ spring:
     mongodb:
       host: localhost
       database: book_db
-
+  shell:
+    interactive:
+      enabled: true
+    noninteractive:
+      enabled: false
+    command:
+      version:
+        enabled: false
 mongock:
   migration-scan-package:
     - ru.otus.hw.migration
   enabled: true
+  transactional: false
   runner-type: initializingbean
   mongo-db:
     write-concern:
