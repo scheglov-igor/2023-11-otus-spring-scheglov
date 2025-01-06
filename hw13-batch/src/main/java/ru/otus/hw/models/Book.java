@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "books")
@@ -33,4 +34,12 @@ public class Book {
     @ToString.Exclude
     private List<Genre> genres;
 
+
+    public List<String> getGenreIds() {
+        List<String> idList = new ArrayList<>();
+        for (Genre genre: genres) {
+            idList.add(genre.getId());
+        }
+        return idList;
+    }
 }

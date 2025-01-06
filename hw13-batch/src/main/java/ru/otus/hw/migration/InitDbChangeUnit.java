@@ -73,20 +73,20 @@ public class InitDbChangeUnit {
     }
 
     private static List<Author> getDbAuthors() {
-        return LongStream.range(1, 4).boxed()
-                .map(id -> new Author(id.toString(), "Author_" + id))
+        return LongStream.range(1, 4000).boxed()
+                .map(id -> new Author(id + "s", "Author_" + id))
                 .toList();
     }
 
     private static List<Genre> getDbGenres() {
-        return LongStream.range(1, 7).boxed()
-                .map(id -> new Genre(id.toString(), "Genre_" + id))
+        return LongStream.range(1, 9000).boxed()
+                .map(id -> new Genre(id + "s", "Genre_" + id))
                 .toList();
     }
 
     private static List<Book> getDbBooks(List<Author> dbAuthors, List<Genre> dbGenres) {
-        return IntStream.range(1, 4).boxed()
-                .map(id -> new Book(id.toString(),
+        return IntStream.range(1, 4000).boxed()
+                .map(id -> new Book(id + "s",
                         "BookTitle_" + id,
                         dbAuthors.get(id - 1),
                         dbGenres.subList((id - 1) * 2, (id - 1) * 2 + 2)
@@ -95,11 +95,13 @@ public class InitDbChangeUnit {
     }
 
     private static List<Comment> getDbComments(List<Book> books) {
-        return List.of(
-                new Comment("1", books.get(0), "comment_1"),
-                new Comment("2", books.get(0), "comment_2"),
-                new Comment("3", books.get(1), "comment_3")
-        );
+        return IntStream.range(1, 4000).boxed()
+                .map(id -> new Comment(
+                        id + "s",
+                        books.get(id / 2),
+                        "comment_" + id
+                ))
+                .toList();
     }
 
     @RollbackExecution

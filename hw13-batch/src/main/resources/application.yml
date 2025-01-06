@@ -57,3 +57,6 @@ logging:
             core:
               MongoTemplate: DEBUG
     Batch: INFO
+
+app:
+  chunksize: 1000
