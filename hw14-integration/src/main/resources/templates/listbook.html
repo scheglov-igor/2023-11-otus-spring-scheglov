@@ -7,6 +7,7 @@
 
     <meta name="show-button-caption" th:content="#{show-button-caption}"/>
     <meta name="delete-button-caption" th:content="#{delete-button-caption}"/>
+    <meta name="print-button-caption" th:content="#{print-button-caption}"/>
 
     <title>List of all Books</title>
     <style type="text/css">
@@ -74,6 +75,7 @@
         <th th:text="#{book-show-header}">Action</th>
         <th th:text="#{delete-button-caption}">Action</th>
         <th th:text="#{book-field-comments}">Action</th>
+        <th th:text="#{print-button-caption}">Action</th>
     </tr>
     </thead>
 
@@ -113,6 +115,7 @@
 
         const showButtonCaption = document.querySelector('meta[name="show-button-caption"]').getAttribute('content');
         const deleteButtonCaption = document.querySelector('meta[name="delete-button-caption"]').getAttribute('content');
+        const printButtonCaption = document.querySelector('meta[name="print-button-caption"]').getAttribute('content');
 
         let tr = document.createElement("tr");
 
@@ -151,24 +154,38 @@
         let deleteButton = document.createElement('button');
         deleteButton.innerHTML = deleteButtonCaption;
         let deleteClickHandler = function () {
-            console.log('Click just happened' + item.id);
+            console.log('Click delete just happened' + item.id);
             deleteBook(item.id, tr);
         }
         deleteButton.addEventListener('click', deleteClickHandler)
         td.appendChild(deleteButton);
         tr.appendChild(td);
 
+
         td = document.createElement("td");
         let commentButton = document.createElement('button');
         commentButton.innerHTML = showButtonCaption;
         commentButton.classList.add('show');
         let commentClickHandler = function () {
-            console.log('Click just happened' + item.id);
+            console.log('Click show just happened' + item.id);
             loadComments(item.id, td, commentButton);
         }
         commentButton.addEventListener('click', commentClickHandler)
         td.appendChild(commentButton);
         tr.appendChild(td);
+
+
+        td = document.createElement("td");
+        let printButton = document.createElement('button');
+        printButton.innerHTML = printButtonCaption;
+        let printClickHandler = function () {
+            console.log('Click print just happened' + item.id);
+            printBook(item.id, tr);
+        }
+        printButton.addEventListener('click', printClickHandler)
+        td.appendChild(printButton);
+        tr.appendChild(td);
+
 
         containerElement.appendChild(tr);
     }
@@ -245,6 +262,26 @@
         })
         .catch(err => {
             console.error(err);
+        });
+    }
+
+    function printBook(bookId, tr) {
+        console.log(bookId);
+        console.log(tr);
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        fetch("/api/paperbook/"+bookId, {
+            method: 'GET',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(jsonData  => {
+            console.log(jsonData);
+            alert("PRINTED_BOOK \n" + JSON.stringify(jsonData));
         });
     }
 

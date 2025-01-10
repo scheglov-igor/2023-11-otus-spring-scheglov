@@ -27,15 +27,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/books/new", "/books/edit/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/books/*").hasAnyRole("USER", "ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/book", "/api/book/*").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/book", "/api/book/*", "/api/paperbook/*")
+                            .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/book").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/book").hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/book/*").hasAnyRole("ADMIN")
 
                         .requestMatchers("/comments/**").hasAnyRole("USER", "ADMIN")
-
                         .requestMatchers("/api/comment", "/api/comment/*").hasAnyRole("USER", "ADMIN")
-
                         .anyRequest().denyAll()
                 )
                 .formLogin(Customizer.withDefaults());

@@ -2,6 +2,7 @@ package ru.otus.hw.services;
 
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
+import ru.otus.hw.dto.PaperBookDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +24,6 @@ public interface BookService {
     BookDto update(BookFormDto bookRequestPojo);
 
     void deleteById(String id);
+
+    Optional<PaperBookDto> printBook(String id);
 }

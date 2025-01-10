@@ -17,9 +17,5 @@ mongock:
 logging:
   level:
     ROOT: info
-    org:
-      springframework:
-        data:
-          mongodb:
-            core:
-              MongoTemplate: DEBUG
+    org.springframework.integration: debug
+    org.springframework.data.mongodb.core.MongoTemplate: debug

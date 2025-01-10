@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.annotation.DirtiesContext;
@@ -19,6 +20,7 @@ import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.dto.GenreDto;
+import ru.otus.hw.dto.PaperBookDto;
 import ru.otus.hw.models.Book;
 
 import java.util.List;
@@ -27,6 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("Сервис для работы с книгами")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -61,6 +64,25 @@ class BookServiceImplTest extends AbstractMongoTest {
     void shouldReturnCorrectBookById(BookDto expectedBook) {
         System.out.println("############ shouldReturnCorrectBookById");
         var actualBook = bookServiceImpl.findById(expectedBook.getId());
+        assertThat(actualBook).isPresent()
+                .get()
+                .isEqualTo(expectedBook);
+    }
+
+
+    @MockBean
+    private BookPrinterGateway bookPrinterGateway;
+
+    @DisplayName("должен загружать бумажную книгу по id")
+    @ParameterizedTest
+    @MethodSource("ru.otus.hw.services.StandartExpectedDtoProvider#getPaperBookDtoList")
+    void shouldReturnCorrectPaperBookById(PaperBookDto expectedBook) {
+
+        System.out.println("############ shouldReturnCorrectPaperBookById");
+
+        given(bookPrinterGateway.process(expectedBook.getId())).willReturn(Optional.of(expectedBook));
+
+        var actualBook = bookServiceImpl.printBook(expectedBook.getId());
         assertThat(actualBook).isPresent()
                 .get()
                 .isEqualTo(expectedBook);
@@ -195,5 +217,8 @@ class BookServiceImplTest extends AbstractMongoTest {
         assertThat(Optional.ofNullable(mongoOperations.findById(existingBook.get().getId(), Book.class)))
                 .isEmpty();
     }
+
+
+
 
 }

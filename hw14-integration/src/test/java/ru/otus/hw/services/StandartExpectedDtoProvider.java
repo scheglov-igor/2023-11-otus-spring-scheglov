@@ -6,6 +6,7 @@ import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.dto.CommentFormDto;
 import ru.otus.hw.dto.GenreDto;
+import ru.otus.hw.dto.PaperBookDto;
 
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,12 @@ public class StandartExpectedDtoProvider {
         return getBookDtoList(authorDtoList, genreDtoList);
     }
 
+    public static List<PaperBookDto> getPaperBookDtoList() {
+        var authorDtoList = getAuthorDtoList();
+        var genreDtoList = getGenreDtoList();
+        return getPaperBookDtoList(authorDtoList, genreDtoList);
+    }
+
     public static List<BookDto> getBookDtoList(List<AuthorDto> authorDtoList, List<GenreDto> genreDtoList) {
         return IntStream.range(1, 4).boxed()
                 .map(id -> new BookDto(id.toString(),
@@ -41,6 +48,17 @@ public class StandartExpectedDtoProvider {
                 ))
                 .toList();
     }
+
+    public static List<PaperBookDto> getPaperBookDtoList(List<AuthorDto> authorDtoList, List<GenreDto> genreDtoList) {
+        return IntStream.range(1, 4).boxed()
+                .map(id -> new PaperBookDto(id.toString(),
+                        "BookTitle_" + id,
+                        authorDtoList.get(id - 1),
+                        genreDtoList.subList((id - 1) * 2, (id - 1) * 2 + 2)
+                ))
+                .toList();
+    }
+
 
     public static List<BookFormDto> getBookFormDtoList() {
         return IntStream.range(1, 4).boxed()

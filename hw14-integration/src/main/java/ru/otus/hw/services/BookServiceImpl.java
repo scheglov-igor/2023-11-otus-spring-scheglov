@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
+import ru.otus.hw.dto.PaperBookDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
@@ -33,6 +34,8 @@ public class BookServiceImpl implements BookService {
     private final CommentRepository commentRepository;
 
     private final BookConverter bookConverter;
+
+    private final BookPrinterGateway bookPrinterGateway;
 
     @Override
     @Transactional(readOnly = true)
@@ -114,6 +117,12 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PaperBookDto> printBook(String id) {
+        var paperBookOptional = bookPrinterGateway.process(id);
+        return paperBookOptional;
+    }
 
 
 }

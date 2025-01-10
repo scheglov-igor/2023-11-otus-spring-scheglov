@@ -50,7 +50,10 @@ public class BookRestControllerSecurityTest extends AbstractControllersSecurityT
                 Arguments.of("put", "/api/book", content, "admin", roleAdmin, 200, false),
                 Arguments.of("delete", "/api/book/1", null, null, null, 302, true),
                 Arguments.of("delete", "/api/book/1", null, "user", roleUser, 403, false),
-                Arguments.of("delete", "/api/book/1", null, "admin", roleAdmin, 200, false)
-        );
+                Arguments.of("delete", "/api/book/1", null, "admin", roleAdmin, 200, false),
+                Arguments.of("get", "/api/paperbook/1", null, null, null, 302, true),
+                Arguments.of("get", "/api/paperbook/1", null, "user", roleUser, 200, false),
+                Arguments.of("get", "/api/paperbook/1", null, "admin", roleAdmin, 200, false)
+                );
     }
 }

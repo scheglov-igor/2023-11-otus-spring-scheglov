@@ -14,6 +14,7 @@ import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.dto.GenreDto;
+import ru.otus.hw.dto.PaperBookDto;
 import ru.otus.hw.services.BookService;
 import ru.otus.hw.validator.BookFormDtoValidator;
 
@@ -50,6 +51,10 @@ public class BookRestControllerTest {
         return new BookDto("1", "TestTitle", new AuthorDto("1", "AuthorName"),
                 List.of(new GenreDto("1", "Genre")));
     }
+    private PaperBookDto getPaperBook() {
+        return new PaperBookDto("1", "TestTitle", new AuthorDto("1", "AuthorName"),
+                List.of(new GenreDto("1", "Genre")));
+    }
 
     private List<BookDto> getBooks() {
         return List.of(getBook());
@@ -74,6 +79,18 @@ public class BookRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(getBook())));
     }
+
+
+    @Test
+    public void testGetPaperBookById() throws Exception {
+
+        given(bookService.printBook("1")).willReturn(Optional.of(getPaperBook()));
+
+        mvc.perform(get("/api/paperbook/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(mapper.writeValueAsString(getPaperBook())));
+    }
+
 
     @Test
     public void testCreateNewBook() throws Exception {
@@ -119,5 +136,6 @@ public class BookRestControllerTest {
         mvc.perform(delete("/api/book/1"))
                 .andExpect(status().isOk());
     }
+
 
 }

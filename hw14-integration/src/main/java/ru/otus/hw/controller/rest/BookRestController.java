@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import ru.otus.hw.dto.PaperBookDto;
 import ru.otus.hw.validator.BookFormDtoValidator;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
@@ -70,6 +71,14 @@ public class BookRestController {
     @DeleteMapping("/api/book/{id}")
     public void deleteBookById(@PathVariable String id) {
         bookService.deleteById(id);
+    }
+
+
+    @GetMapping("/api/paperbook/{id}")
+    public PaperBookDto getPaperBookById(@PathVariable String id) {
+        var paperBook = bookService.printBook(id);
+        return paperBook
+                .orElseThrow(() -> new EntityNotFoundException("no id: %s".formatted(id)));
     }
 
 }
