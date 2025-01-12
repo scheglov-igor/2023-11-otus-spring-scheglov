@@ -20,9 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-
                         .requestMatchers("/login").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/", "/books").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/books/new", "/books/edit/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/books/*").hasAnyRole("USER", "ADMIN")
@@ -33,13 +31,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/book/*").hasAnyRole("ADMIN")
 
                         .requestMatchers("/comments/**").hasAnyRole("USER", "ADMIN")
-
                         .requestMatchers("/api/comment", "/api/comment/*").hasAnyRole("USER", "ADMIN")
+
+                        .requestMatchers("/actuator/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/datarest/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/explorer/**").hasAnyRole("ADMIN")
 
                         .anyRequest().denyAll()
                 )
                 .formLogin(Customizer.withDefaults());
-
         return http.build();
     }
 }

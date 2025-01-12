@@ -55,6 +55,14 @@ public class BookServiceImpl implements BookService {
         return bookConverter.toDtoList(bookList);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean isLibraryEmpty() {
+        var bookList = bookRepository.count();
+        return bookList == 0L;
+    }
+
     @Override
     @Transactional
     @Secured({ "ROLE_ADMIN" })

@@ -3,7 +3,10 @@ spring:
     mongodb:
       host: localhost
       database: book_db
-
+    rest:
+      basePath: /datarest
+  jmx:
+    enabled: true
 mongock:
   migration-scan-package:
     - ru.otus.hw.migration
@@ -23,3 +26,12 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

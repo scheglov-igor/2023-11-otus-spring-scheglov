@@ -14,6 +14,8 @@ public interface BookService {
 
     List<BookDto> findAll();
 
+    Boolean isLibraryEmpty();
+
     BookDto insert(String title, String authorId, Set<String> genresIds);
 
     BookDto update(String id, String title, String authorId, Set<String> genresIds);

@@ -10,6 +10,16 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 		System.out.printf("Чтобы перейти на страницу сайта открывай: %n%s%n",
 				"http://localhost:8080");
+
+		System.out.printf("Чтобы перейти на actuator: %n%s%n",
+				"http://localhost:8080/actuator");
+
+		System.out.printf("Чтобы перейти на actuator health: %n%s%n",
+				"http://localhost:8080/actuator/health");
+
+		System.out.printf("Чтобы перейти на HAL Explorer: %n%s%n",
+				"http://localhost:8080/datarest");
+
 	}
 
 }
