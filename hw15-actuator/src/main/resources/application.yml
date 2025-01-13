@@ -31,7 +31,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include:
+          - metrics
+          - health
+          - logfile
   endpoint:
     health:
       show-details: always
+    logfile:
+      external-file: log/spring-boot-logger.log
