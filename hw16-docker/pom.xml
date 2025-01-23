@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.otus.hw</groupId>
-    <artifactId>hw15-docker</artifactId>
+    <artifactId>hw16-docker</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>hw15-docker</name>
+    <name>hw16-docker</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
