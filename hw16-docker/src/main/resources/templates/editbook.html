@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+    <title>One Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+            vertical-align: top;
+        }
+
+        .bookValue {
+            display: inline-block;
+            font-weight: bold;
+
+            width: 200px;
+        }
+
+        input:read-only {
+            background: lightgray;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        h3 {
+            padding: 2px;
+            padding-left: 10px;
+        }
+        .errors {
+            color: red;
+        }
+
+    </style>
+
+    <script>
+        function saveBook() {
+            console.log("savebook");
+            const bookIdInput = document.getElementById("book-id-input");
+            const bookTitleInput = document.getElementById("title");
+            const bookAuthorIdSelect = document.getElementById("authorId");
+            const bookGenreIdsCheckboxes = document.querySelectorAll('input[name="genreIds"]');
+
+            const selectedGenres = Array.from(bookGenreIdsCheckboxes).filter(function (checkboxInp) {
+                return checkboxInp.checked;
+            }).map(function (checkboxInp) {
+                return checkboxInp.value;
+            });
+
+            const book = {
+                id:bookIdInput.value,
+                title: bookTitleInput.value,
+                authorId: bookAuthorIdSelect.value,
+                genreIds: selectedGenres
+            }
+
+            let httpMethod;
+            if(!bookIdInput.value || bookIdInput.value.length === 0) {
+                httpMethod = 'POST';
+            }
+            else {
+                httpMethod = 'PUT';
+            }
+
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            fetch("/api/book", {
+                method: httpMethod,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(book)
+            })
+            .then(response => {
+                console.log(response);
+                if(response.status == "403") {
+                    alert("forbidden!");
+                }
+                else {
+                    processBookResponse(response)
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        }
+
+        function processBookResponse(rawResponse) {
+
+            console.log(rawResponse);
+
+            let elements = document.getElementsByClassName("errors");
+            while(elements.length > 0) {
+                elements[0].parentNode.removeChild(elements[0]);
+            }
+
+            if(rawResponse.status === 200) {
+                rawResponse.json().then(jsonData => (processBookFill(jsonData)));
+            }
+
+            if(rawResponse.status === 400) {
+                rawResponse.json().then(jsonData => (processBookErrors(jsonData)));
+            }
+
+        }
+
+        function processBookFill(bookJSON) {
+
+            let inputId = document.getElementById("book-id-input");
+            inputId.value = bookJSON.id
+
+            let inputTitle = document.getElementById("title");
+            inputTitle.value = bookJSON.title;
+
+            let selectAuthor = document.getElementById("authorId");
+            selectAuthor.value = bookJSON.author.id;
+
+            const bookGenreIdsCheckboxes =  document.querySelectorAll('input[name="genreIds"]');
+
+            let selectGenres = bookJSON.genres.map(function (checkboxInp) {
+                return checkboxInp.id;
+            });
+
+            bookGenreIdsCheckboxes.forEach(checkboxInp => {
+                console.log(checkboxInp);
+                checkboxInp.checked = selectGenres.includes(checkboxInp.id);
+            })
+        }
+
+
+        function processBookErrors(errorMsgs) {
+
+            errorMsgs.forEach(msg => {
+
+                let rowDiv = document.getElementById(msg.fieldName).parentElement;
+                console.log(rowDiv);
+
+                let errorDiv = document.createElement("div");
+                errorDiv.innerText = msg.defaultMessage;
+                errorDiv.classList = "errors";
+                rowDiv.appendChild(errorDiv);
+
+            })
+        }
+
+    </script>
+
+</head>
+<body>
+
+<div style="text-align: right">
+    <b th:text="#{lang-switcher-header}">Select language</b>:
+    <a href="#" th:href="@{''(lang=en)}" th:text="#{en-lang-switch-button-caption}">Language - EN</a>
+    |
+    <a href="#" th:href="@{''(lang=ru)}" th:text="#{ru-lang-switch-button-caption}">Language - RU</a>
+    |
+    <a href="/logout" th:href="@{/logout}">
+        <button type="button" th:text="#{logout-button-caption}">выход</button>
+    </a>
+</div>
+
+<div><a th:href="@{/}" href="listbook.html" th:text="#{all-books-button-caption}">All</a></div>
+
+<form id="edit-form" action="showbook.html" th:action="@{/api/book}" th:method="post" th:object="${book}">
+
+    <h3 th:text="#{book-show-header}">Book:</h3>
+
+    <div class="row">
+        <label for="book-id-input" th:text="#{field-id} + ':'">ID:</label>
+        <input id="book-id-input" type="text" readonly="readonly" name="id" class="bookValue"
+               th:value="*{id}" value="1"/>
+    </div>
+
+    <div class="row">
+        <label for="title" th:text="#{book-field-title} + ':'">title:</label>
+        <input id="title" name="title" type="text" class="bookValue"
+               th:value="*{title}" value="Book1"/>
+        <div class="errors" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Wrong book title error</div>
+    </div>
+
+    <div class="row">
+        <label for="authorId" th:text="#{book-field-author} + ':'">author:</label>
+        <select id="authorId" name="authorId" class="bookValue"
+                th:field="*{authorId}"
+        />
+            <option th:value="''"
+                    th:text="Select"></option>
+            <option th:each="authorItem : ${authors}"
+                    th:value="${authorItem.id}"
+                    th:text="${authorItem.fullName}"
+                    th:selected="${authorItem.id} == *{authorId}"
+            >Author</option>
+        </select>
+        <div class="errors" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}">Wrong value error</div>
+    </div>
+
+    <div class="row">
+        <label th:text="#{book-field-genres} + ':'">genres:</label>
+
+        <div class="bookValue" id="genreIds">
+            <div th:each="genre : ${genres}">
+                <input type="checkbox"
+                       name="genreIds"
+                       th:field="*{genreIds}"
+                       th:value="${genre.id}"
+                       th:id="${genre.id}"
+                />
+                <label th:for="${genre.id}" th:text="${genre.name}">label</label>
+            </div>
+        </div>
+
+        <div class="errors" th:if="${#fields.hasErrors('genreIds')}" th:errors="*{genreIds}">Wrong value error</div>
+    </div>
+
+    <div class="row">
+        <button type="button" onclick="saveBook()" th:text="#{save-button-caption}">Save</button>
+        <a href="listbook.html" th:href="@{/}">
+            <button type="button" th:text="#{cancel-button-caption}">Cancel</button>
+        </a>
+    </div>
+
+</form>
+
+</body>
+</html>

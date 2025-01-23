@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>One Book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        .book {
+            border: 1px solid steelblue;
+            width: 500px;
+            border-collapse: collapse;
+            background-color: lightgray;
+        }
+
+        .bookLabel {
+            display: inline-block;
+            width: 100px;
+            padding-inline-start: 10px;
+        }
+
+        .bookValue {
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .bookValue {
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        ul.bookValue {
+            padding-inline-start: 20px;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        h3 {
+            padding: 2px;
+            padding-left: 10px;
+        }
+
+        .comments {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .comments tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .comments td:first-child {
+            width: 250px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div style="text-align: right">
+    <b th:text="#{lang-switcher-header}">Select language</b>:
+    <a href="#" th:href="@{''(lang=en)}" th:text="#{en-lang-switch-button-caption}">Language - EN</a>
+    |
+    <a href="#" th:href="@{''(lang=ru)}" th:text="#{ru-lang-switch-button-caption}">Language - RU</a>
+    |
+    <a href="/logout" th:href="@{/logout}">
+        <button type="button" th:text="#{logout-button-caption}">выход</button>
+    </a>
+</div>
+
+<div><a th:href="@{/}" href="listbook.html" th:text="#{all-books-button-caption}">All</a></div>
+
+
+<div class="book">
+
+    <h3 th:text="#{book-show-header} + ':'">Book:</h3>
+
+    <div class="row">
+        <span class="bookLabel" th:text="#{field-id} + ':'">ID:</span>
+        <span class="bookValue" th:text="${book.id}">1</span>
+    </div>
+
+    <div class="row">
+        <span class="bookLabel" th:text="#{book-field-title} + ':'">title:</span>
+        <span class="bookValue" th:text="${book.title}">Book title</span>
+    </div>
+
+    <div class="row">
+        <span class="bookLabel" th:text="#{book-field-author} + ':'">author:</span>
+        <span class="bookValue" th:text="${book.author.fullName}">author</span>
+    </div>
+
+    <div class="row">
+        <span class="bookLabel" th:text="#{book-field-genres} + ':'">genres:</span>
+        <ul class="bookValue">
+            <li th:each="genre : ${book.genres}" th:text="${genre.name}">genre</li>
+        </ul>
+    </div>
+
+</div>
+
+<div><a th:href="@{/books/edit/__${book.id}__}" href="editbook.html" th:text="#{edit-button-caption}">Edit</a></div>
+
+<div class="row">
+    <h3 th:text="#{book-field-comments} + ':'">Comments</h3>
+    <table class="comments">
+        <tr th:each="comment : ${comments}">
+            <td th:text="${comment.commentText}">comment</td>
+            <td>
+                <a th:href="@{/comments/edit/__${comment.id}__}" href="editcomment.html" th:text="#{edit-button-caption}">Edit</a>
+            </td>
+            <td>
+                <form action="#" th:action="@{/comments/delete/__${comment.id}__}" th:method="post" >
+                    <input type="text" name="bookid" th:value="${book.id}" hidden/>
+                    <button type="submit" id="submitButton" th:text="#{delete-button-caption}">Delete</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <div><a th:href="@{/comments/new(bookid=${book.id})}" href="editcomment.html" th:text="#{add-button-caption}">Add</a></div>
+</div>
+
+</body>
+</html>
