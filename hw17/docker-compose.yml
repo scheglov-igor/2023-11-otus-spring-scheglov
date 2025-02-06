@@ -9,9 +9,17 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
     ports:
       - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
-  app-resilience4j:
+  appbookinfo:
+    build:
+      context: hw17-book-info
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - $SPRING_ADD_LOCAL_PORT:$SPRING_ADD_DOCKER_PORT
+  appresilience4j:
     depends_on:
       - mongo_db
+      - appbookinfo
     build:
       context: hw17-Resilience4J
       dockerfile: Dockerfile
@@ -26,12 +34,5 @@ services:
       - spring.data.mongodb.username=$MONGODB_USER
       - spring.data.mongodb.password=$MONGODB_PASSWORD
       - spring.data.mongodb.authentication-database=admin
-  app-book-info:
-    depends_on:
-      - app-resilience4j
-    build:
-      context: hw17-book-info
-      dockerfile: Dockerfile
-    env_file: .env
-    ports:
-      - $SPRING_ADD_LOCAL_PORT:$SPRING_ADD_DOCKER_PORT
+      - app.additional.host=appbookinfo
+      - app.additional.port=$SPRING_ADD_DOCKER_PORT

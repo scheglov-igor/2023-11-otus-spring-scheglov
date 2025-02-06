@@ -47,3 +47,6 @@ management:
       external-file: log/spring-boot-logger.log
 app:
   timeoutDuration: 5
+  additional:
+    host: localhost
+    port: 8081
