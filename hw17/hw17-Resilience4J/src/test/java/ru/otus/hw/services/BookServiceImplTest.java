@@ -6,12 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.AbstractMongoTest;
+import ru.otus.hw.client.BookAdditionalInfoClient;
 import ru.otus.hw.converters.AuthorConverter;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.converters.GenreConverter;
@@ -24,13 +28,17 @@ import ru.otus.hw.models.Book;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("Сервис для работы с книгами")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@Import({BookServiceImpl.class, BookConverter.class, AuthorConverter.class, GenreConverter.class})
+@Import({BookServiceImpl.class, BookConverter.class, AuthorConverter.class, GenreConverter.class,
+       BookAdditionalInfoClient.class, CircuitBreakerFactory.class})
 class BookServiceImplTest extends AbstractMongoTest {
 
     @Autowired
@@ -41,6 +49,12 @@ class BookServiceImplTest extends AbstractMongoTest {
 
     @Autowired
     private BookConverter bookConverter;
+
+    @MockBean
+    private BookAdditionalInfoClient bookAdditionalInfoClient;
+
+    @MockBean
+    private CircuitBreakerFactory circuitBreakerFactory;
 
     private List<AuthorDto> authorDtoList;
 
@@ -60,6 +74,15 @@ class BookServiceImplTest extends AbstractMongoTest {
     @MethodSource("ru.otus.hw.services.StandartExpectedDtoProvider#getBookDtoList")
     void shouldReturnCorrectBookById(BookDto expectedBook) {
         System.out.println("############ shouldReturnCorrectBookById");
+
+        given(circuitBreakerFactory.create("defaultCircuitBreaker")).willReturn(new CircuitBreaker() {
+            @Override
+            public <T> T run(Supplier<T> toRun, Function<Throwable, T> fallback) {
+                return null;
+            }
+        });
+
+
         var actualBook = bookServiceImpl.findById(expectedBook.getId());
         assertThat(actualBook).isPresent()
                 .get()

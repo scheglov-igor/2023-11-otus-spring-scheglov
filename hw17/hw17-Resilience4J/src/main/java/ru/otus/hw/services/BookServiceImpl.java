@@ -1,15 +1,20 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.client.BookAdditionalInfoClient;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.BookFormDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.BookData;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -21,8 +26,10 @@ import java.util.Set;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-@RequiredArgsConstructor
+
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
     private final AuthorRepository authorRepository;
 
@@ -34,11 +41,41 @@ public class BookServiceImpl implements BookService {
 
     private final BookConverter bookConverter;
 
+    private final BookAdditionalInfoClient bookAdditionalInfoClient;
+
+    private final CircuitBreakerFactory circuitBreakerFactory;
+
     @Override
     @Transactional(readOnly = true)
     public Optional<BookDto> findById(String id) {
         var book = bookRepository.findById(id);
-        return book.map(bookConverter::toDto);
+        var bookDto = book.map(bookConverter::toDto);
+        bookDto = requestAdditionalInfo(bookDto);
+        return bookDto;
+    }
+
+    private Optional<BookDto> requestAdditionalInfo(Optional<BookDto> bookDto) {
+        if (bookDto.isPresent()) {
+            var startTime = System.currentTimeMillis();
+            String additionalInfo = circuitBreakerFactory.create("defaultCircuitBreaker").run(() -> {
+                log.info("request additional info...");
+                ResponseEntity<BookData> addressResponse = bookAdditionalInfoClient
+                        .getAdditionalInfo(bookDto.get().getTitle());
+                log.info("addressResponse.getBody() = {}", addressResponse.getBody());
+                BookData bookData = addressResponse.getBody();
+                log.info("bookData {}", bookData);
+                return bookData.data();
+            }, throwable -> {
+                log.error("delay call failed error:{}", throwable.getMessage());
+                return null;
+            });
+            log.info("duration {} ms", System.currentTimeMillis() - startTime);
+            var requestResult = String.format(
+                    "ClientInfo name:%s, additional:%s", bookDto.get().getTitle(), additionalInfo);
+            log.info("requestResult {}", requestResult);
+            bookDto.get().setAdditionalInfo(additionalInfo);
+        }
+        return bookDto;
     }
 
     @Override

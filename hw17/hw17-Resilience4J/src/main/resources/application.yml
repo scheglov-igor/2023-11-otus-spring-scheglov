@@ -17,6 +17,11 @@ mongock:
       journal: false
     read-concern: local
 
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 50
+
 logging:
   level:
     ROOT: info
@@ -40,3 +45,5 @@ management:
       show-details: always
     logfile:
       external-file: log/spring-boot-logger.log
+app:
+  timeoutDuration: 5

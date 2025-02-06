@@ -103,6 +103,11 @@
         </ul>
     </div>
 
+    <div class="row" th:if="${book.additionalInfo}">
+        <span class="additionalInfo" th:text="#{book-additional-info} + ':'">Additional info:</span>
+        <span class="additionalInfo" th:text="${book.additionalInfo}">Additional info</span>
+    </div>
+
 </div>
 
 <div><a th:href="@{/books/edit/__${book.id}__}" href="editbook.html" th:text="#{edit-button-caption}">Edit</a></div>
