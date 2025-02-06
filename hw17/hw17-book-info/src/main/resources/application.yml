@@ -1,0 +1,19 @@
+server:
+  port: 8081
+logging:
+  level:
+    ROOT: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - metrics
+          - health
+          - logfile
+  endpoint:
+    health:
+      show-details: always
+    logfile:
+      external-file: log/spring-boot-logger.log
