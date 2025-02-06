@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.hw.models.BookData;
 
-@FeignClient(name = "bookInfo", url = "http://${app.additional.host}:${app.additional.port}"/*, path = "/address-service"*/)
+@FeignClient(name = "bookInfo", url = "http://${app.additional.host}:${app.additional.port}")
 public interface BookAdditionalInfoClient {
 
     @GetMapping(value = "/additional-info", consumes = "application/json")
