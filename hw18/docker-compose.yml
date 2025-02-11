@@ -1,0 +1,38 @@
+version: '3'
+services:
+  mongo_db:
+    image: "mongo:7.0.14"
+    container_name: mongodb-container
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
+    ports:
+      - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+  appbookinfo:
+    build:
+      context: hw18-book-info
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - $SPRING_ADD_LOCAL_PORT:$SPRING_ADD_DOCKER_PORT
+  appresilience4j:
+    depends_on:
+      - mongo_db
+      - appbookinfo
+    build:
+      context: hw18-Resilience4J
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    # Эти свойства перегружают соответствующие в application.yml
+    environment:
+      - spring.data.mongodb.host=mongo_db
+      - spring.data.mongodb.port=$MONGODB_DOCKER_PORT
+      - spring.data.mongodb.database=$MONGODB_DATABASE
+      - spring.data.mongodb.username=$MONGODB_USER
+      - spring.data.mongodb.password=$MONGODB_PASSWORD
+      - spring.data.mongodb.authentication-database=admin
+      - app.additional.host=appbookinfo
+      - app.additional.port=$SPRING_ADD_DOCKER_PORT
