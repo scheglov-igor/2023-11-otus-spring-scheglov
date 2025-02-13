@@ -1,0 +1,26 @@
+server:
+  port: 8082
+logging:
+  level:
+    ROOT: info
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - metrics
+          - health
+          - logfile
+  endpoint:
+    health:
+      show-details: always
+    logfile:
+      external-file: log/spring-boot-logger.log
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      database: book_db

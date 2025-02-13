@@ -16,12 +16,28 @@ services:
     env_file: .env
     ports:
       - $SPRING_ADD_LOCAL_PORT:$SPRING_ADD_DOCKER_PORT
-  appresilience4j:
+  appwebflux:
+    depends_on:
+      - mongo_db
+    build:
+      context: hw18-webflux
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - $SPRING_WF_LOCAL_PORT:$SPRING_WF_DOCKER_PORT
+    environment:
+      - spring.data.mongodb.host=mongo_db
+      - spring.data.mongodb.port=$MONGODB_DOCKER_PORT
+      - spring.data.mongodb.database=$MONGODB_DATABASE
+      - spring.data.mongodb.username=$MONGODB_USER
+      - spring.data.mongodb.password=$MONGODB_PASSWORD
+      - spring.data.mongodb.authentication-database=admin
+  applibrary:
     depends_on:
       - mongo_db
       - appbookinfo
     build:
-      context: hw18-Resilience4J
+      context: hw18-Library
       dockerfile: Dockerfile
     env_file: .env
     ports:
