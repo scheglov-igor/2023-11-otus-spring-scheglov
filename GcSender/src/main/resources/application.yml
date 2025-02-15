@@ -1,0 +1,49 @@
+
+spring:
+  config:
+    import:
+      # общий конфиг для приложений.
+      # под виндой не работает. В линуксе - проверял
+#      - /data/PIVP/webconfig/config.properties
+      # конфиг лежит в папке с jar, переопределяет глобальный конфиг
+      - config.properties
+
+#  datasource:
+#    url: jdbc:postgresql://192.168.5.161:5431/infadp
+#    url: jdbc:postgresql://localhost:5432/<YOUR_DATABASE_NAME>
+#    username: planeta_stable
+#    password: nitasoft
+#  h2:
+#    console:
+#      path: /h2-console
+#      settings:
+#        web-allow-others: true
+#  flyway:
+#    enabled: true
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+#  data:
+#    mongodb:
+#      host: localhost
+#      database: book_db
+
+#mongock:
+#  migration-scan-package:
+#    - ru.otus.hw.migration
+#  enabled: true
+#  runner-type: initializingbean
+#  mongo-db:
+#    write-concern:
+#      journal: false
+#    read-concern: local
+
+logging:
+  level:
+    ROOT: info
+    org.springframework.integration: debug
+#    org.springframework.data.mongodb.core.MongoTemplate: debug
+
+#debug: true
