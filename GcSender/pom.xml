@@ -216,7 +216,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>ru.nita.GcSender</mainClass>
+                            <mainClass>ru.otus.hw</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

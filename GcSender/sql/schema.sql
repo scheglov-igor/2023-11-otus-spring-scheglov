@@ -76,3 +76,5 @@ CREATE TABLE gc_sending_tb (
 ) ;
 
 
+insert into gc_sending_tb (id, date_change, is_active, row_state, server_name) values
+  (0, current_date, 0, 0, 'SCHIV-NB (192.168.0.123)')
