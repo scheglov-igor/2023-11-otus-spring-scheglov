@@ -1,0 +1,23 @@
+
+spring:
+  config:
+    import:
+      # общий конфиг для приложений.
+      # под виндой не работает. В линуксе - проверял
+#      - /data/PIVP/webconfig/config.properties
+      # конфиг лежит в папке с jar, переопределяет глобальный конфиг
+      - config.properties
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+logging:
+  level:
+    ROOT: info
+    org.springframework.integration: debug
+#    org.springframework.data.mongodb.core.MongoTemplate: debug
+
+#debug: true
